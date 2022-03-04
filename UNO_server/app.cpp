@@ -59,5 +59,47 @@ void CApp::Cleanup()
 
 void CApp::Update()
 {
+	fd_set fdSocketInfors;
+	fd_set fdReads;
+	int iRet;
+	unsigned int i;
+	SOCKET sockClient, sockTemp;
+	SOCKADDR_IN addrClient;
+	int addrSize;
+	char recvBuffer[255];
+	int recvSize;
+	FD_ZERO(&fdSocketInfors);
+	FD_SET(m_sockServer, &fdSocketInfors);
 
+	SOCKET  socketClient;
+	while (1)
+	{
+		fdReads = fdSocketInfors;
+		iRet = select(0, &fdReads, 0, 0, 0);
+		if (iRet == SOCKET_ERROR) return;
+		for (i = 0; i < fdSocketInfors.fd_count; i++)
+		{
+			sockTemp = fdSocketInfors.fd_array[i];
+			if (FD_ISSET(sockTemp, &fdReads))
+			{
+				if (sockTemp == m_sockServer)
+				{
+					addrSize = sizeof(addrClient);
+					sockClient = accept(m_sockServer, (SOCKADDR*)&addrClient, &addrSize);
+					FD_SET(sockClient, &fdSocketInfors);
+				}
+				else
+				{
+					recvSize = recv(sockTemp, recvBuffer, sizeof(recvBuffer), 0);
+					int size = recvBuffer[0];
+					int type = recvBuffer[1];
+					char* buffer = new char[size];
+					for (int i = 0; i < size; i++)
+					{
+						printf("%d ", recvBuffer[i]);
+					}
+				}
+			}
+		}
+	}
 }
