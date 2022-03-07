@@ -20,3 +20,11 @@ public:
 	~CUser();
 private:
 };
+
+/*
+	1. accept
+	2. recv
+	3. 타입을 처리
+	4. send
+	5.
+*/
