@@ -4,27 +4,18 @@
 
 class CUser
 {
-public:
-	enum TYPE
-	{
-		NICK_NAME = 1,
-		CHATTING
-	};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+public:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 private:
 	SOCKET m_clientSock;
 	SOCKADDR_IN m_addrClient;
-	char m_name[5];
+	char* m_pRecvBuffer;
+	int m_recvedSize;
 
 public:
 	CUser();
 	~CUser();
+	CUser(SOCKET _socket, SOCKADDR_IN& _addr);
+
+	int Recv();
 private:
 };
-
-/*
-	1. accept
-	2. recv
-	3. 타입을 처리
-	4. send
-	5.
-*/

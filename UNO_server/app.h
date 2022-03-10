@@ -1,8 +1,7 @@
 #pragma once
-#pragma once
+#include "Server.h"
+
 #include <stdio.h>
-#include <WinSock2.h>
-#include <WS2tcpip.h>
 
 #define MAX 64
 
@@ -10,8 +9,7 @@ class CApp
 {
 public:
 private:
-	SOCKET m_sockServer;
-	
+	CServer* m_pServer;
 public:
 	CApp();
 	~CApp();
