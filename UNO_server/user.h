@@ -2,20 +2,18 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
-class CUser
+class CUser //目池记, 技记
 {
 public:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 private:
-	SOCKET m_clientSock;
-	SOCKADDR_IN m_addrClient;
-	char* m_pRecvBuffer;
-	int m_recvedSize;
+	SOCKET m_socket;
+	SOCKADDR_IN m_addr;
 
 public:
 	CUser();
 	~CUser();
 	CUser(SOCKET _socket, SOCKADDR_IN& _addr);
 
-	int Recv();
+	SOCKET GetSock() { return m_socket; }
 private:
 };
