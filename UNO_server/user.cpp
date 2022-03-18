@@ -1,5 +1,7 @@
-#include "user.h"
-#include <stdio.h>
+#include "User.h"
+#include <string.h>
+
+#define MAX 64
 
 CUser::CUser()
 {
@@ -9,7 +11,9 @@ CUser::~CUser()
 {
 }
 
-CUser::CUser(SOCKET _socket, SOCKADDR_IN& _addr) 
-	: m_socket(_socket), m_addr(_addr)
+CUser::CUser(char* _recvBuffer)
 {
+	char* recvtemp = _recvBuffer + 4; // recvSize, type을 제외한 값
+	m_pName = new char[MAX];
+	memcpy(m_pName, recvtemp, strlen(recvtemp) + 1);
 }

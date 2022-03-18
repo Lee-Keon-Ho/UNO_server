@@ -1,4 +1,5 @@
 #include "select.h"
+#include <stdio.h>
 #pragma comment( lib, "ws2_32.lib")
 #define BUFFER_MAX 255
 
@@ -15,7 +16,8 @@ CSelect::~CSelect()
 CSelect::CSelect(SOCKET _listenSocket) 
 	: m_listenSocket(_listenSocket)
 {
-	
+	m_pRooms = new CRoomList();
+	m_pUserList = new CUserList();
 }
 
 void CSelect::Update()
@@ -48,9 +50,10 @@ void CSelect::Update()
 					recvSize = Recv(sockTemp);
 					if (recvSize < 0)
 					{
-						delete m_fdSocketInfors.user_array[i];
-						m_fdSocketInfors.user_array[i] = nullptr;
+						delete m_fdSocketInfors.session_array[i];
+						m_fdSocketInfors.session_array[i] = nullptr;
 						FD_CLR_EX(sockTemp, &m_fdSocketInfors);
+
 					}
 				}
 			}
@@ -66,7 +69,7 @@ void CSelect::Accept()
 	int count = m_fdSocketInfors.fd_count;
 	addrSize = sizeof(addrClient);
 	sockClient = accept(m_listenSocket, (SOCKADDR*)&addrClient, &addrSize);
-	m_fdSocketInfors.user_array[count] = new CUser(sockClient, addrClient);
+	m_fdSocketInfors.session_array[count] = new CSession(sockClient, addrClient);
 	FD_SET(sockClient, &m_fdSocketInfors);
 }
 
@@ -94,6 +97,11 @@ int CSelect::Recv(SOCKET _socket)
 		// roomlist
 		// 총 room의 개수 각 room의 접속한 유저수 게임 진행현황
 		//
+		for (int i = 0; i < packetSize; i++)
+		{
+			printf("%d ", recvBuffer[i]);
+		}
+
 		recvedSize -= packetSize;
 		if (recvedSize > 0)
 		{
@@ -107,10 +115,20 @@ int CSelect::Recv(SOCKET _socket)
 
 void CSelect::HandlePacket(char* _recvBuffer, int _type)
 {
-	if (_type) // 접속이면
+	if (_type == NICK_NAME)
 	{
+		m_pUserList->Add(_recvBuffer);
+	}
+	if (_type == CREATE_ROOM) // 접속이면
+	{
+		m_pRooms->Add(_recvBuffer);
 		// userlist.setUser(_recvBuffer);
 		// class roomlist, userlist 각 class에서 send를 해주면 된다.
 		// send(m_socket)
 	}
+}
+
+void CSelect::Remove(int _num)
+{
+
 }

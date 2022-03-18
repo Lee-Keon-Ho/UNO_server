@@ -1,19 +1,13 @@
 #pragma once
-#include <WinSock2.h>
-#include <WS2tcpip.h>
 
-class CUser //커넥션, 세션
+class CUser
 {
-public:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+public:
 private:
-	SOCKET m_socket;
-	SOCKADDR_IN m_addr;
-
+	// 어떤 clientSocket인지 알아야 하나?
+	char* m_pName;
 public:
 	CUser();
 	~CUser();
-	CUser(SOCKET _socket, SOCKADDR_IN& _addr);
-
-	SOCKET GetSock() { return m_socket; }
-private:
+	CUser(char* _recvBuffer);
 };

@@ -141,17 +141,25 @@
   <ItemGroup>
     <ClCompile Include="app.cpp" />
     <ClCompile Include="list.cpp" />
+    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="RoomList.cpp" />
     <ClCompile Include="select.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="UNO_server.cpp" />
-    <ClCompile Include="user.cpp" />
+    <ClCompile Include="session.cpp" />
+    <ClCompile Include="User.cpp" />
+    <ClCompile Include="UserList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
     <ClInclude Include="list.h" />
+    <ClInclude Include="Room.h" />
+    <ClInclude Include="RoomList.h" />
     <ClInclude Include="select.h" />
     <ClInclude Include="Server.h" />
-    <ClInclude Include="user.h" />
+    <ClInclude Include="session.h" />
+    <ClInclude Include="User.h" />
+    <ClInclude Include="UserList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

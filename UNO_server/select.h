@@ -1,10 +1,12 @@
 #pragma once
-#include "user.h"
+#include "session.h"
+#include "RoomList.h"
+#include "UserList.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
 struct fd_set_ex : fd_set {
-    CUser* user_array[FD_SETSIZE];
+    CSession* session_array[FD_SETSIZE];
 };
 
 #define FD_CLR_EX(fd, set) do { \
@@ -14,8 +16,8 @@ struct fd_set_ex : fd_set {
             while (__i < ((fd_set_ex FAR *)(set))->fd_count-1) { \
                 ((fd_set_ex FAR *)(set))->fd_array[__i] = \
                     ((fd_set_ex FAR *)(set))->fd_array[__i+1]; \
-				((fd_set_ex FAR *)(set))->user_array[__i] = \
-					((fd_set_ex FAR *)(set))->user_array[__i+1]; \
+				((fd_set_ex FAR *)(set))->session_array[__i] = \
+					((fd_set_ex FAR *)(set))->session_array[__i+1]; \
                 __i++; \
             } \
             ((fd_set_ex FAR *)(set))->fd_count--; \
@@ -34,7 +36,7 @@ struct fd_set_ex : fd_set {
     if (__i == ((fd_set_ex FAR *)(set))->fd_count) { \
         if (((fd_set_ex FAR *)(set))->fd_count < FD_SETSIZE) { \
             ((fd_set_ex FAR *)(set))->fd_array[__i] = (fd); \
-			((fd_set_ex FAR *)(set))->user_array[__i] = (user); \
+			((fd_set_ex FAR *)(set))->session_array[__i] = (user); \
             ((fd_set_ex FAR *)(set))->fd_count++; \
         } \
     } \
@@ -45,10 +47,19 @@ struct fd_set_ex : fd_set {
 class CSelect
 {
 public:
+    enum TYPE
+    {
+        NICK_NAME = 1,
+        CREATE_ROOM,
+        MAX
+    };
+
 private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;
 
+    CRoomList* m_pRooms;
+    CUserList* m_pUserList;
 public:
 	CSelect();
 	~CSelect();
@@ -59,5 +70,6 @@ public:
     int Recv(SOCKET _socket);
 
     void HandlePacket(char* _recvBuffer, int _type);
+    void Remove(int _num);
 private:
 };
