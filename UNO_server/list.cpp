@@ -8,7 +8,7 @@ CList::~CList()
 {
 }
 
-void CList::Add(const char* _recvBuffer)
+void CList::Add(char* _recvBuffer)
 {
 }
 

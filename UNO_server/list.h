@@ -9,7 +9,7 @@ public:
 	CList();
 	~CList();
 
-	virtual void Add(const char* _recvBuffer);
+	virtual void Add(char* _recvBuffer);
 	virtual void Remove();
 private:
 };
