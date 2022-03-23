@@ -1,9 +1,11 @@
 #pragma once
 #include "session.h"
-#include "RoomList.h"
+#include "Room.h"
+#include "user.h"
 #include "UserList.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <list>
 
 struct fd_set_ex : fd_set {
     CSession* session_array[FD_SETSIZE];
@@ -47,6 +49,9 @@ struct fd_set_ex : fd_set {
 class CSelect
 {
 public:
+    typedef std::list<CRoom*> RoomList;
+    typedef std::list<CUser*> UserList;
+
     enum TYPE
     {
         NICK_NAME = 1,
@@ -58,8 +63,8 @@ private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;
 
-    CRoomList* m_pRooms;
-    CUserList* m_pUserList;
+    RoomList roomlist;
+    UserList userlist;
 public:
 	CSelect();
 	~CSelect();

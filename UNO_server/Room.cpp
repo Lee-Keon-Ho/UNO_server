@@ -1,17 +1,19 @@
 #include "Room.h"
-
-#define MAX 255
+#include <memory>
 
 CRoom::CRoom()
 {
-	m_roomName = new char[MAX];
-	m_roomNum = new char[MAX];
-	m_state = new char[MAX];
+}
+
+CRoom::CRoom(char* _name)
+{
+	// 수정 필요
+	m_room.number = 0;
+	memcpy(m_room.name, _name, 64);
+	m_room.playerCount = 0;
+	m_room.state = false;
 }
 
 CRoom::~CRoom()
 {
-	if (m_state) { delete m_state; m_state = nullptr; }
-	if (m_roomNum) { delete m_roomNum; m_roomNum = nullptr; }
-	if (m_roomName) { delete m_roomName; m_roomName = nullptr; }
 }

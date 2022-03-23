@@ -16,8 +16,6 @@ CSelect::~CSelect()
 CSelect::CSelect(SOCKET _listenSocket) 
 	: m_listenSocket(_listenSocket)
 {
-	m_pRooms = new CRoomList();
-	m_pUserList = new CUserList();
 }
 
 void CSelect::Update()
@@ -97,10 +95,6 @@ int CSelect::Recv(SOCKET _socket)
 		// roomlist
 		// 총 room의 개수 각 room의 접속한 유저수 게임 진행현황
 		//
-		for (int i = 0; i < packetSize; i++)
-		{
-			printf("%d ", recvBuffer[i]);
-		}
 
 		recvedSize -= packetSize;
 		if (recvedSize > 0)
@@ -117,11 +111,30 @@ void CSelect::HandlePacket(char* _recvBuffer, int _type)
 {
 	if (_type == NICK_NAME)
 	{
-		m_pUserList->Add(_recvBuffer);
+		userlist.push_back(new CUser(_recvBuffer));
+		char recvBuffer[255] = { 0 };
+		int count = 0;
+		UserList::iterator iter = userlist.begin();
+	
+		for (; iter != userlist.end(); iter++)
+		{
+			CUser* temp = iter.operator*();
+			int len = strlen(recvBuffer) + 1;
+			int len2 = strlen(temp->GetName()) + 1;
+			//strcat_s(recvBuffer, temp->GetName());
+
+			memcpy(recvBuffer + len, temp->GetName(), len2);
+		}
+
+		for (int i = 0; i < m_fdSocketInfors.fd_count; i++)
+		{
+			send(m_fdSocketInfors.fd_array[i], _recvBuffer, strlen(_recvBuffer) + 1, 0);
+		}
 	}
-	if (_type == CREATE_ROOM) // 접속이면
+	if (_type == CREATE_ROOM)
 	{
-		m_pRooms->Add(_recvBuffer);
+		//roomlist.
+		roomlist.push_back(new CRoom(_recvBuffer));
 		// userlist.setUser(_recvBuffer);
 		// class roomlist, userlist 각 class에서 send를 해주면 된다.
 		// send(m_socket)

@@ -142,7 +142,6 @@
     <ClCompile Include="app.cpp" />
     <ClCompile Include="list.cpp" />
     <ClCompile Include="Room.cpp" />
-    <ClCompile Include="RoomList.cpp" />
     <ClCompile Include="select.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="UNO_server.cpp" />
@@ -154,7 +153,6 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="Room.h" />
-    <ClInclude Include="RoomList.h" />
     <ClInclude Include="select.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="session.h" />
