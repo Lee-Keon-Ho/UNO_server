@@ -112,23 +112,42 @@ void CSelect::HandlePacket(char* _recvBuffer, int _type)
 	if (_type == NICK_NAME)
 	{
 		userlist.push_back(new CUser(_recvBuffer));
-		char recvBuffer[255] = { 0 };
+
+		char buffer[255];
 		int count = 0;
 		UserList::iterator iter = userlist.begin();
-	
+		int bufferlen = 0;
 		for (; iter != userlist.end(); iter++)
 		{
 			CUser* temp = iter.operator*();
-			int len = strlen(recvBuffer) + 1;
-			int len2 = strlen(temp->GetName()) + 1;
+			
+			int len = strlen(temp->GetName()) + 1;
 			//strcat_s(recvBuffer, temp->GetName());
 
-			memcpy(recvBuffer + len, temp->GetName(), len2);
+			memcpy(buffer + bufferlen, temp->GetName(), len);
+			bufferlen += len;
 		}
+
+		char sendBuffer[255]; // 크기는?
+		char* tempBuffer = sendBuffer;
+
+		*(unsigned short*)tempBuffer = 2 + 2 + bufferlen;
+		tempBuffer += sizeof(unsigned short);
+		*(unsigned short*)tempBuffer = _type;
+		tempBuffer += sizeof(unsigned short);
+
+		memcpy(tempBuffer, buffer, bufferlen);
+		int bufferSize = tempBuffer - sendBuffer + bufferlen;
+		/*int sendSize = send(m_socket, sendBuffer, len, 0);
+		if (sendSize < 0)
+		{
+			return false;
+		}*/
 
 		for (int i = 0; i < m_fdSocketInfors.fd_count; i++)
 		{
-			send(m_fdSocketInfors.fd_array[i], _recvBuffer, strlen(_recvBuffer) + 1, 0);
+			int sendLen = send(m_fdSocketInfors.fd_array[i], sendBuffer, bufferSize, 0);
+			if (sendLen < 0); // 수정
 		}
 	}
 	if (_type == CREATE_ROOM)
