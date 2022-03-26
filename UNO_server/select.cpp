@@ -69,6 +69,14 @@ void CSelect::Accept()
 	sockClient = accept(m_listenSocket, (SOCKADDR*)&addrClient, &addrSize);
 	m_fdSocketInfors.session_array[count] = new CSession(sockClient, addrClient);
 	FD_SET(sockClient, &m_fdSocketInfors);
+
+	//test
+	char sendBuffer[] = { "hi" };
+	for (int i = 1; i < m_fdSocketInfors.fd_count; i++)
+	{
+		int sendLen = send(m_fdSocketInfors.fd_array[i], sendBuffer, strlen(sendBuffer) + 1, 0);
+		if (sendLen < 0); // 수정
+	}
 }
 
 int CSelect::Recv(SOCKET _socket)
@@ -138,16 +146,11 @@ void CSelect::HandlePacket(char* _recvBuffer, int _type)
 
 		memcpy(tempBuffer, buffer, bufferlen);
 		int bufferSize = tempBuffer - sendBuffer + bufferlen;
-		/*int sendSize = send(m_socket, sendBuffer, len, 0);
-		if (sendSize < 0)
-		{
-			return false;
-		}*/
 
+		// sendAll
 		for (int i = 0; i < m_fdSocketInfors.fd_count; i++)
 		{
 			int sendLen = send(m_fdSocketInfors.fd_array[i], sendBuffer, bufferSize, 0);
-			if (sendLen < 0); // 수정
 		}
 	}
 	if (_type == CREATE_ROOM)
