@@ -95,7 +95,7 @@ int CSelect::Recv(SOCKET _socket)
 
 	while (recvedSize >= packetSize)
 	{
-		HandlePacket(recvBuffer, type);
+		HandlePacket(_socket ,recvBuffer, type);
 		//HandlePacket(m_recvBuffer);
 		//여기서 처리 type별로 처리
 		// 이건 닉네임이야 -> 처음 접속 -> roomlist, userlist, chatting
@@ -115,7 +115,7 @@ int CSelect::Recv(SOCKET _socket)
 	return recvLen;
 }
 
-void CSelect::HandlePacket(char* _recvBuffer, int _type)
+void CSelect::HandlePacket(SOCKET _socket, char* _recvBuffer, int _type)
 {
 	if (_type == NICK_NAME)
 	{
@@ -147,11 +147,7 @@ void CSelect::HandlePacket(char* _recvBuffer, int _type)
 		memcpy(tempBuffer, buffer, bufferlen);
 		int bufferSize = tempBuffer - sendBuffer + bufferlen;
 
-		// sendAll
-		for (int i = 0; i < m_fdSocketInfors.fd_count; i++)
-		{
-			int sendLen = send(m_fdSocketInfors.fd_array[i], sendBuffer, bufferSize, 0);
-		}
+		send(_socket, sendBuffer, bufferSize, 0);
 	}
 	if (_type == CREATE_ROOM)
 	{

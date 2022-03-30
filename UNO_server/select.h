@@ -74,7 +74,7 @@ public:
     void Accept();
     int Recv(SOCKET _socket);
 
-    void HandlePacket(char* _recvBuffer, int _type);
+    void HandlePacket(SOCKET _socket, char* _recvBuffer, int _type);
     void Remove(int _num);
 private:
 };
