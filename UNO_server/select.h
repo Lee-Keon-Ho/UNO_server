@@ -75,6 +75,6 @@ public:
     int Recv(SOCKET _socket);
 
     void HandlePacket(SOCKET _socket, char* _recvBuffer, int _type);
-    void Remove(int _num);
+    void Erase(int _num);
 private:
 };

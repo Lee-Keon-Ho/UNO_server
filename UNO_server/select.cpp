@@ -50,6 +50,7 @@ void CSelect::Update()
 					{
 						delete m_fdSocketInfors.session_array[i];
 						m_fdSocketInfors.session_array[i] = nullptr;
+						Erase(i);
 						FD_CLR_EX(sockTemp, &m_fdSocketInfors);
 
 					}
@@ -102,7 +103,7 @@ int CSelect::Recv(SOCKET _socket)
 		//
 		// roomlist
 		// 총 room의 개수 각 room의 접속한 유저수 게임 진행현황
-		//
+		
 
 		recvedSize -= packetSize;
 		if (recvedSize > 0)
@@ -134,6 +135,7 @@ void CSelect::HandlePacket(SOCKET _socket, char* _recvBuffer, int _type)
 
 			memcpy(buffer + bufferlen, temp->GetName(), len);
 			bufferlen += len;
+			count++;
 		}
 
 		char sendBuffer[255]; // 크기는?
@@ -143,6 +145,8 @@ void CSelect::HandlePacket(SOCKET _socket, char* _recvBuffer, int _type)
 		tempBuffer += sizeof(unsigned short);
 		*(unsigned short*)tempBuffer = _type;
 		tempBuffer += sizeof(unsigned short);
+		//*tempBuffer = count;
+		//tempBuffer += sizeof(unsigned char);
 
 		memcpy(tempBuffer, buffer, bufferlen);
 		int bufferSize = tempBuffer - sendBuffer + bufferlen;
@@ -159,7 +163,12 @@ void CSelect::HandlePacket(SOCKET _socket, char* _recvBuffer, int _type)
 	}
 }
 
-void CSelect::Remove(int _num)
+void CSelect::Erase(int _num)
 {
-
+	UserList::iterator iter = userlist.begin();
+	for (int i = 1; i < _num; i++)
+	{
+		iter++;
+	}
+	userlist.erase(iter);
 }
