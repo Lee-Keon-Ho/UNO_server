@@ -96,6 +96,14 @@ int CSelect::Recv(SOCKET _socket)
 
 	while (recvedSize >= packetSize)
 	{
+		// 이렇게 recvBuffer를 그대로 사용할 수 없음..
+		// recvBuffer를 가지고 있는 주인은 누구일까요??
+		//    그 답이 나온다면 여기서 recvBuffer를 그대로 사용하지는 못할듯
+		//    즉 덜 받은 상태에서 다른 유저에게 packet이 온 경우는 어떻게 할까요??
+		//    recvBuffer[64][1000] 이건 안됨 
+
+
+
 		HandlePacket(_socket ,recvBuffer, type);
 		//HandlePacket(m_recvBuffer);
 		//여기서 처리 type별로 처리
