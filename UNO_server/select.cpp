@@ -45,7 +45,8 @@ void CSelect::Update()
 				}
 				else
 				{
-					recvSize = Recv(sockTemp);
+					//recvSize = Recv(sockTemp);
+					recvSize = m_fdSocketInfors.session_array[i]->Recv();
 					if (recvSize < 0)
 					{
 						delete m_fdSocketInfors.session_array[i];
@@ -78,50 +79,6 @@ void CSelect::Accept()
 		int sendLen = send(m_fdSocketInfors.fd_array[i], sendBuffer, strlen(sendBuffer) + 1, 0);
 		if (sendLen < 0); // 수정
 	}
-}
-
-int CSelect::Recv(SOCKET _socket)
-{
-	char recvBuffer[BUFFER_MAX];
-	int recvedSize = 0;
-	int recvLen = recv(_socket, recvBuffer + recvedSize, BUFFER_MAX - recvedSize, 0);
-	if (recvLen < 1)  return recvLen;
-
-	recvedSize += recvLen;
-
-	if (recvedSize < 2)  return recvLen;
-
-	unsigned short packetSize = *(unsigned short*)recvBuffer;
-	unsigned short type = *(unsigned short*)(recvBuffer + 2);
-
-	while (recvedSize >= packetSize)
-	{
-		// 이렇게 recvBuffer를 그대로 사용할 수 없음..
-		// recvBuffer를 가지고 있는 주인은 누구일까요??
-		//    그 답이 나온다면 여기서 recvBuffer를 그대로 사용하지는 못할듯
-		//    즉 덜 받은 상태에서 다른 유저에게 packet이 온 경우는 어떻게 할까요??
-		//    recvBuffer[64][1000] 이건 안됨 
-
-
-
-		HandlePacket(_socket ,recvBuffer, type);
-		//HandlePacket(m_recvBuffer);
-		//여기서 처리 type별로 처리
-		// 이건 닉네임이야 -> 처음 접속 -> roomlist, userlist, chatting
-		//
-		// roomlist
-		// 총 room의 개수 각 room의 접속한 유저수 게임 진행현황
-		
-
-		recvedSize -= packetSize;
-		if (recvedSize > 0)
-		{
-			memcpy(recvBuffer, recvBuffer + packetSize, recvedSize);
-			recvedSize = recvBuffer[0];
-		}
-	}
-
-	return recvLen;
 }
 
 void CSelect::HandlePacket(SOCKET _socket, char* _recvBuffer, int _type)

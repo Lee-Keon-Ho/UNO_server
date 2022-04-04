@@ -2,7 +2,6 @@
 #include "session.h"
 #include "Room.h"
 #include "user.h"
-#include "UserList.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <list>
@@ -56,6 +55,7 @@ public:
     {
         NICK_NAME = 1,
         CREATE_ROOM,
+        USERLIST,
         MAX
     };
 
@@ -72,7 +72,6 @@ public:
 
     void Update();
     void Accept();
-    int Recv(SOCKET _socket);
 
     void HandlePacket(SOCKET _socket, char* _recvBuffer, int _type);
     void Erase(int _num);

@@ -36,10 +36,10 @@
     <ClCompile Include="Room.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="UserList.cpp">
+    <ClCompile Include="User.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="User.cpp">
+    <ClCompile Include="Information.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,10 +62,10 @@
     <ClInclude Include="Room.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="UserList.h">
+    <ClInclude Include="User.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="User.h">
+    <ClInclude Include="Information.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
