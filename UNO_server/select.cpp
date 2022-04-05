@@ -1,11 +1,12 @@
 #include "select.h"
+
 #include <stdio.h>
 #pragma comment( lib, "ws2_32.lib")
 #define BUFFER_MAX 255
 
 CSelect::CSelect()
 {
-
+	
 }
 
 CSelect::~CSelect()
@@ -16,6 +17,7 @@ CSelect::~CSelect()
 CSelect::CSelect(SOCKET _listenSocket) 
 	: m_listenSocket(_listenSocket)
 {
+	m_pList = CInformation::GetInstance()->GetList();
 }
 
 void CSelect::Update()
@@ -81,59 +83,12 @@ void CSelect::Accept()
 	}
 }
 
-void CSelect::HandlePacket(SOCKET _socket, char* _recvBuffer, int _type)
-{
-	if (_type == NICK_NAME)
-	{
-		userlist.push_back(new CUser(_recvBuffer));
-
-		char buffer[255];
-		int count = 0;
-		UserList::iterator iter = userlist.begin();
-		int bufferlen = 0;
-		for (; iter != userlist.end(); iter++)
-		{
-			CUser* temp = iter.operator*();
-			
-			int len = strlen(temp->GetName()) + 1;
-			//strcat_s(recvBuffer, temp->GetName());
-
-			memcpy(buffer + bufferlen, temp->GetName(), len);
-			bufferlen += len;
-			count++;
-		}
-
-		char sendBuffer[255]; // 크기는?
-		char* tempBuffer = sendBuffer;
-
-		*(unsigned short*)tempBuffer = 2 + 2 + bufferlen;
-		tempBuffer += sizeof(unsigned short);
-		*(unsigned short*)tempBuffer = _type;
-		tempBuffer += sizeof(unsigned short);
-		//*tempBuffer = count;
-		//tempBuffer += sizeof(unsigned char);
-
-		memcpy(tempBuffer, buffer, bufferlen);
-		int bufferSize = tempBuffer - sendBuffer + bufferlen;
-
-		send(_socket, sendBuffer, bufferSize, 0);
-	}
-	if (_type == CREATE_ROOM)
-	{
-		//roomlist.
-		roomlist.push_back(new CRoom(_recvBuffer));
-		// userlist.setUser(_recvBuffer);
-		// class roomlist, userlist 각 class에서 send를 해주면 된다.
-		// send(m_socket)
-	}
-}
-
 void CSelect::Erase(int _num)
 {
-	UserList::iterator iter = userlist.begin();
+	UserList::iterator iter = m_pList->userlist.begin();
 	for (int i = 1; i < _num; i++)
 	{
 		iter++;
 	}
-	userlist.erase(iter);
+	m_pList->userlist.erase(iter);
 }

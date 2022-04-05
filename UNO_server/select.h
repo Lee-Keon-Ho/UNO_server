@@ -1,5 +1,6 @@
 #pragma once
 #include "session.h"
+#include "Information.h"
 #include "Room.h"
 #include "user.h"
 #include <WinSock2.h>
@@ -56,6 +57,7 @@ public:
         NICK_NAME = 1,
         CREATE_ROOM,
         USERLIST,
+        ROOMLIST,
         MAX
     };
 
@@ -63,8 +65,7 @@ private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;
 
-    RoomList roomlist;
-    UserList userlist;
+    CInformation::LIST* m_pList;
 public:
 	CSelect();
 	~CSelect();

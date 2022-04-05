@@ -13,6 +13,7 @@ public:
 		NICK_NAME = 1,
 		CREATE_ROOM,
 		USERLIST,
+		ROOMLIST,
 		MAX
 	};
 
@@ -21,7 +22,7 @@ private:
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
 
-	CInformation::LIST* m_list;
+	CInformation::LIST* m_pList;
 public:
 	CSession();
 	~CSession();

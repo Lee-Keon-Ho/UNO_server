@@ -12,7 +12,7 @@ CSession::~CSession()
 CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
-	m_list = CInformation::GetInstance()->GetList();
+	m_pList = CInformation::GetInstance()->GetList();
 }
 
 int CSession::Recv()
@@ -47,19 +47,13 @@ void CSession::HandlePacket(int _type)
 {
 	if (_type == NICK_NAME)
 	{
-		m_list->userlist.push_back(new CUser(m_buffer));
-	}
-	if (_type == CREATE_ROOM)
-	{
+		m_pList->userlist.push_back(new CUser(m_buffer));
 
-	}
-	if (_type == USERLIST)
-	{
 		char buffer[255];
 		int count = 0;
-		std::list<CUser*>::iterator iter = m_list->userlist.begin();
+		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
 		int bufferlen = 0;
-		for (; iter != m_list->userlist.end(); iter++)
+		for (; iter != m_pList->userlist.end(); iter++)
 		{
 			CUser* temp = iter.operator*();
 
@@ -78,12 +72,56 @@ void CSession::HandlePacket(int _type)
 		tempBuffer += sizeof(unsigned short);
 		*(unsigned short*)tempBuffer = _type;
 		tempBuffer += sizeof(unsigned short);
-		//*tempBuffer = count;
-		//tempBuffer += sizeof(unsigned char);
+
+		memcpy(tempBuffer, buffer, bufferlen);
+		int bufferSize = tempBuffer - sendBuffer + bufferlen;
+
+		char roomName[] = "test";
+		CRoom* room = new CRoom(roomName);
+		CRoom* temp = new CRoom();
+		m_pList->roomlist.push_back(room);
+
+		memcpy(temp, room, sizeof(CRoom));
+
+		send(m_socket, sendBuffer, bufferSize, 0);
+	}
+	if (_type == CREATE_ROOM)
+	{
+
+	}
+	if (_type == USERLIST)
+	{
+		char buffer[255];
+		int count = 0;
+		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
+		int bufferlen = 0;
+		for (; iter != m_pList->userlist.end(); iter++)
+		{
+			CUser* temp = iter.operator*();
+
+			int len = strlen(temp->GetName()) + 1;
+			//strcat_s(recvBuffer, temp->GetName());
+
+			memcpy(buffer + bufferlen, temp->GetName(), len);
+			bufferlen += len;
+			count++;
+		}
+
+		char sendBuffer[255]; // Å©±â´Â?
+		char* tempBuffer = sendBuffer;
+
+		*(unsigned short*)tempBuffer = 2 + 2 + bufferlen;
+		tempBuffer += sizeof(unsigned short);
+		*(unsigned short*)tempBuffer = _type;
+		tempBuffer += sizeof(unsigned short);
 
 		memcpy(tempBuffer, buffer, bufferlen);
 		int bufferSize = tempBuffer - sendBuffer + bufferlen;
 
 		send(m_socket, sendBuffer, bufferSize, 0);
+	}
+	if (_type == ROOMLIST)
+	{
+		
 	}
 }
