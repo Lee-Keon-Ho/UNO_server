@@ -1,10 +1,13 @@
 #pragma once
 
+#define NAME_MAX 16
+
 class CUser
 {
 public:
+
 private:
-	char* m_pName;
+	char m_pName[NAME_MAX];
 public:
 	CUser();
 	~CUser();

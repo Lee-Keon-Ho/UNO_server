@@ -49,39 +49,29 @@ void CSession::HandlePacket(int _type)
 	{
 		m_pList->userlist.push_back(new CUser(m_buffer));
 
-		char buffer[255];
-		int count = 0;
-		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
-		int bufferlen = 0;
-		for (; iter != m_pList->userlist.end(); iter++)
-		{
-			CUser* temp = iter.operator*();
-
-			int len = strlen(temp->GetName()) + 1;
-			//strcat_s(recvBuffer, temp->GetName());
-
-			memcpy(buffer + bufferlen, temp->GetName(), len);
-			bufferlen += len;
-			count++;
-		}
-
-		char sendBuffer[255]; // 크기는?
+		/*─────────────────────────────────────────────────────────────────*/
+		char sendBuffer[1000];
 		char* tempBuffer = sendBuffer;
 
-		*(unsigned short*)tempBuffer = 2 + 2 + bufferlen;
+		int listSize = m_pList->userlist.size();
+
+		*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
 		tempBuffer += sizeof(unsigned short);
 		*(unsigned short*)tempBuffer = _type;
 		tempBuffer += sizeof(unsigned short);
 
-		memcpy(tempBuffer, buffer, bufferlen);
-		int bufferSize = tempBuffer - sendBuffer + bufferlen;
+		//std::list<CUser*>::iterator 
+		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
+		int len = sizeof(CUser);
+		for (; iter != m_pList->userlist.end(); iter++)
+		{
+			CUser* temp = iter.operator*();
+		
+			memcpy(tempBuffer, temp, len);
+			tempBuffer += len;
+		}
 
-		char roomName[] = "test";
-		CRoom* room = new CRoom(roomName);
-		CRoom* temp = new CRoom();
-		m_pList->roomlist.push_back(room);
-
-		memcpy(temp, room, sizeof(CRoom));
+		int bufferSize = tempBuffer - sendBuffer + (len * listSize);
 
 		send(m_socket, sendBuffer, bufferSize, 0);
 	}
@@ -91,32 +81,28 @@ void CSession::HandlePacket(int _type)
 	}
 	if (_type == USERLIST)
 	{
-		char buffer[255];
-		int count = 0;
-		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
-		int bufferlen = 0;
-		for (; iter != m_pList->userlist.end(); iter++)
-		{
-			CUser* temp = iter.operator*();
-
-			int len = strlen(temp->GetName()) + 1;
-			//strcat_s(recvBuffer, temp->GetName());
-
-			memcpy(buffer + bufferlen, temp->GetName(), len);
-			bufferlen += len;
-			count++;
-		}
-
-		char sendBuffer[255]; // 크기는?
+		char sendBuffer[1000];
 		char* tempBuffer = sendBuffer;
 
-		*(unsigned short*)tempBuffer = 2 + 2 + bufferlen;
+		int listSize = m_pList->userlist.size();
+
+		*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
 		tempBuffer += sizeof(unsigned short);
 		*(unsigned short*)tempBuffer = _type;
 		tempBuffer += sizeof(unsigned short);
 
-		memcpy(tempBuffer, buffer, bufferlen);
-		int bufferSize = tempBuffer - sendBuffer + bufferlen;
+		//std::list<CUser*>::iterator 
+		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
+		int len = sizeof(CUser);
+		for (; iter != m_pList->userlist.end(); iter++)
+		{
+			CUser* temp = iter.operator*();
+
+			memcpy(tempBuffer, temp, len);
+			tempBuffer += len;
+		}
+
+		int bufferSize = tempBuffer - sendBuffer + (len * listSize);
 
 		send(m_socket, sendBuffer, bufferSize, 0);
 	}
