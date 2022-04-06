@@ -65,8 +65,9 @@ void CSession::HandlePacket(int _type)
 		int len = sizeof(CUser);
 		for (; iter != m_pList->userlist.end(); iter++)
 		{
-			CUser* temp = iter.operator*();
-		
+			//CUser* temp = iter.operator*();
+			CUser* temp = *iter;
+
 			memcpy(tempBuffer, temp, len);
 			tempBuffer += len;
 		}

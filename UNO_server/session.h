@@ -5,6 +5,18 @@
 
 #define BUFFER_MAX 1000
 
+/*
+enum ePacketType 
+{
+	CS_PT_NICKNAME = 0 ,
+	NICK_NAME = 1,
+	CREATE_ROOM,
+	USERLIST,
+	ROOMLIST,
+	MAX
+};
+*/
+
 class CSession //目池记, 技记
 {
 public:
@@ -23,6 +35,9 @@ private:
 	char m_buffer[BUFFER_MAX];
 
 	CInformation::LIST* m_pList;
+	// name
+	// room
+
 public:
 	CSession();
 	~CSession();
