@@ -141,7 +141,6 @@
   <ItemGroup>
     <ClCompile Include="app.cpp" />
     <ClCompile Include="Information.cpp" />
-    <ClCompile Include="list.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="select.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -152,7 +151,6 @@
   <ItemGroup>
     <ClInclude Include="app.h" />
     <ClInclude Include="Information.h" />
-    <ClInclude Include="list.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="select.h" />
     <ClInclude Include="Server.h" />

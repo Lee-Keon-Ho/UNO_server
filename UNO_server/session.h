@@ -20,13 +20,13 @@ enum ePacketType
 class CSession //커넥션, 세션
 {
 public:
-	enum TYPE
+	enum ePacketType
 	{
-		NICK_NAME = 1,
-		CREATE_ROOM,
-		USERLIST,
-		ROOMLIST,
-		MAX
+		CS_PT_NICKNAME = 1,
+		CS_PT_CREATEROOM,
+		CS_PT_USERLIST,
+		CS_PT_ROOMLIST,
+		CS_PT_MAX
 	};
 
 private:
@@ -34,9 +34,8 @@ private:
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
 
-	CInformation::LIST* m_pList;
-	// name
-	// room
+	CUser* m_pUser; // 자신의 정보
+	CRoom* m_pRoom; // 자신이 만든 방의 정보가 필요한가?
 
 public:
 	CSession();
@@ -46,5 +45,12 @@ public:
 	SOCKET GetSock() { return m_socket; }
 	int Recv();
 	void HandlePacket(int _type);
+
+	void NickName();
+	void CreateRoom();
+	void UserList();
+	void RoomList();
+
+	CUser* GetUser() { return m_pUser; }
 private:
 };

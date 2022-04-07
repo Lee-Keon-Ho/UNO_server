@@ -10,8 +10,6 @@ private:
 	SOCKET m_listenSocket;
 	CSelect* m_select;
 
-	//class roomList // lobby
-	//class userList
 public:
 	CServer();
 	~CServer();

@@ -14,18 +14,16 @@ public:
 	typedef std::list<CRoom*> RoomList;
 	typedef std::list<CUser*> UserList;
 
-	struct LIST
-	{
-		RoomList roomlist;
-		UserList userlist;
-	};
-
 private:
-	LIST m_list;
+	RoomList m_roomList;
+	UserList m_userList;
 
 public:
-	LIST* GetList() { return &m_list; }
-
+	UserList* GetUserList() { return &m_userList; }
+	RoomList* GetRoomList() { return &m_roomList; }
+	
+	void RemoveUser(CUser* _user);
+	void RemoveRoom(CRoom* _room);
 public:
 	static CInformation* GetInstance();
 	static void DeleteInstance();

@@ -4,21 +4,20 @@
 class CRoom
 {
 public:
-	struct Room
+	struct stROOM
 	{
 		int number;
 		char name[64];
 		int playerCount;
+		int playerMax;
 		bool state;
 	};
 private:
-	// 방이름 (만든사람이름으로 사용할 생각)
-	// 방 번호
-	// 게임 진행 상황
-	Room m_room;
+	stROOM m_room;
+
 public:
 	CRoom();
-	CRoom(char* _name);
+	CRoom(int _number, char* _name);
 	~CRoom();
 private:
 };

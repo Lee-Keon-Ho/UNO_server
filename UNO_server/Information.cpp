@@ -22,3 +22,13 @@ CInformation::~CInformation()
 {
 
 }
+
+void CInformation::RemoveUser(CUser* _user)
+{
+	m_userList.remove(_user);
+}
+
+void CInformation::RemoveRoom(CRoom* _room)
+{
+	m_roomList.remove(_room);
+}

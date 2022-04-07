@@ -12,7 +12,7 @@ CSession::~CSession()
 CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
-	m_pList = CInformation::GetInstance()->GetList();
+	
 }
 
 int CSession::Recv()
@@ -45,70 +45,115 @@ int CSession::Recv()
 
 void CSession::HandlePacket(int _type)
 {
-	if (_type == NICK_NAME)
+	switch(_type)
 	{
-		m_pList->userlist.push_back(new CUser(m_buffer));
-
-		/*─────────────────────────────────────────────────────────────────*/
-		char sendBuffer[1000];
-		char* tempBuffer = sendBuffer;
-
-		int listSize = m_pList->userlist.size();
-
-		*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
-		tempBuffer += sizeof(unsigned short);
-		*(unsigned short*)tempBuffer = _type;
-		tempBuffer += sizeof(unsigned short);
-
-		//std::list<CUser*>::iterator 
-		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
-		int len = sizeof(CUser);
-		for (; iter != m_pList->userlist.end(); iter++)
-		{
-			//CUser* temp = iter.operator*();
-			CUser* temp = *iter;
-
-			memcpy(tempBuffer, temp, len);
-			tempBuffer += len;
-		}
-
-		int bufferSize = tempBuffer - sendBuffer + (len * listSize);
-
-		send(m_socket, sendBuffer, bufferSize, 0);
+	case CS_PT_NICKNAME:
+		NickName();
+		break;
+	case CS_PT_CREATEROOM:
+		CreateRoom();
+		break;
+	case CS_PT_USERLIST:
+		UserList();
+		break;
+	case CS_PT_ROOMLIST:
+		RoomList();
+		break;
 	}
-	if (_type == CREATE_ROOM)
+}
+
+
+void CSession::NickName()
+{
+	CInformation* pInformation = CInformation::GetInstance();
+	pInformation->GetUserList()->push_back(new CUser(m_buffer));
+
+	CInformation::UserList userList = *pInformation->GetUserList();
+	
+	char sendBuffer[1000];
+	char* tempBuffer = sendBuffer;
+
+	int listSize = userList.size();
+
+	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
+	tempBuffer += sizeof(unsigned short);
+	*(unsigned short*)tempBuffer = CS_PT_NICKNAME;
+	tempBuffer += sizeof(unsigned short);
+
+	std::list<CUser*>::iterator iter = userList.begin();
+	int len = sizeof(CUser);
+	for (; iter != userList.end(); iter++)
 	{
-
+		memcpy(tempBuffer, *iter, len);
+		tempBuffer += len;
 	}
-	if (_type == USERLIST)
+
+	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
+
+	send(m_socket, sendBuffer, bufferSize, 0);
+}
+
+
+void CSession::CreateRoom()
+{
+	CInformation* pInformation = CInformation::GetInstance();
+	
+	CInformation::RoomList roomList = *pInformation->GetRoomList();
+	
+	int roomNum = roomList.size() + 1;
+
+	pInformation->GetRoomList()->push_back(new CRoom(roomNum, m_buffer));
+}
+
+
+void CSession::UserList()
+{
+	CInformation::UserList userList = *CInformation::GetInstance()->GetUserList();
+	char sendBuffer[1000];
+	char* tempBuffer = sendBuffer;
+
+	int listSize = userList.size();
+
+	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
+	tempBuffer += sizeof(unsigned short);
+	*(unsigned short*)tempBuffer = CS_PT_USERLIST;
+	tempBuffer += sizeof(unsigned short);
+
+	std::list<CUser*>::iterator iter = userList.begin();
+	int len = sizeof(CUser);
+	for (; iter != userList.end(); iter++) // 정확히 몇개가의 기준이 필요하다
 	{
-		char sendBuffer[1000];
-		char* tempBuffer = sendBuffer;
-
-		int listSize = m_pList->userlist.size();
-
-		*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
-		tempBuffer += sizeof(unsigned short);
-		*(unsigned short*)tempBuffer = _type;
-		tempBuffer += sizeof(unsigned short);
-
-		//std::list<CUser*>::iterator 
-		std::list<CUser*>::iterator iter = m_pList->userlist.begin();
-		int len = sizeof(CUser);
-		for (; iter != m_pList->userlist.end(); iter++)
-		{
-			CUser* temp = iter.operator*();
-
-			memcpy(tempBuffer, temp, len);
-			tempBuffer += len;
-		}
-
-		int bufferSize = tempBuffer - sendBuffer + (len * listSize);
-
-		send(m_socket, sendBuffer, bufferSize, 0);
+		memcpy(tempBuffer, *iter, len);
+		tempBuffer += len;
 	}
-	if (_type == ROOMLIST)
+
+	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
+
+	send(m_socket, sendBuffer, bufferSize, 0);
+}
+
+void CSession::RoomList()
+{
+	CInformation::RoomList roomList = *CInformation::GetInstance()->GetRoomList();
+	char sendBuffer[1000];
+	char* tempBuffer = sendBuffer;
+
+	int listSize = roomList.size();
+
+	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CRoom) * listSize);
+	tempBuffer += sizeof(unsigned short);
+	*(unsigned short*)tempBuffer = CS_PT_ROOMLIST;
+	tempBuffer += sizeof(unsigned short);
+
+	std::list<CRoom*>::iterator iter = roomList.begin();
+	int len = sizeof(CRoom);
+	for(; iter != roomList.end(); iter++)
 	{
-		
+		memcpy(tempBuffer, *iter, len);
+		tempBuffer += len;
 	}
+
+	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
+
+	send(m_socket, sendBuffer, bufferSize, 0);
 }

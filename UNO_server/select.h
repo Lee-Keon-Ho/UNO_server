@@ -65,7 +65,6 @@ private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;
 
-    CInformation::LIST* m_pList;
 public:
 	CSelect();
 	~CSelect();
@@ -74,7 +73,6 @@ public:
     void Update();
     void Accept();
 
-    void HandlePacket(SOCKET _socket, char* _recvBuffer, int _type);
-    void Erase(int _num);
+    void remove(CSession* _session);
 private:
 };

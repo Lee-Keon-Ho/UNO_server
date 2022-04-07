@@ -17,7 +17,7 @@ CSelect::~CSelect()
 CSelect::CSelect(SOCKET _listenSocket) 
 	: m_listenSocket(_listenSocket)
 {
-	m_pList = CInformation::GetInstance()->GetList();
+
 }
 
 void CSelect::Update()
@@ -51,9 +51,9 @@ void CSelect::Update()
 					recvSize = m_fdSocketInfors.session_array[i]->Recv();
 					if (recvSize < 0)
 					{
+						remove(m_fdSocketInfors.session_array[i]);
 						delete m_fdSocketInfors.session_array[i];
 						m_fdSocketInfors.session_array[i] = nullptr;
-						Erase(i);
 						FD_CLR_EX(sockTemp, &m_fdSocketInfors);
 
 					}
@@ -73,22 +73,9 @@ void CSelect::Accept()
 	sockClient = accept(m_listenSocket, (SOCKADDR*)&addrClient, &addrSize);
 	m_fdSocketInfors.session_array[count] = new CSession(sockClient, addrClient);
 	FD_SET(sockClient, &m_fdSocketInfors);
-
-	//test
-	char sendBuffer[] = { "hi" };
-	for (int i = 1; i < m_fdSocketInfors.fd_count; i++)
-	{
-		int sendLen = send(m_fdSocketInfors.fd_array[i], sendBuffer, strlen(sendBuffer) + 1, 0);
-		if (sendLen < 0); // ¼öÁ¤
-	}
 }
 
-void CSelect::Erase(int _num)
+void CSelect::remove(CSession* _session)
 {
-	UserList::iterator iter = m_pList->userlist.begin();
-	for (int i = 1; i < _num; i++)
-	{
-		iter++;
-	}
-	m_pList->userlist.erase(iter);
-}
+	CInformation::GetInstance()->GetUserList()->remove(_session->GetUser());
+};
