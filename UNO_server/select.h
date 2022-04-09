@@ -49,17 +49,6 @@ struct fd_set_ex : fd_set {
 class CSelect
 {
 public:
-    typedef std::list<CRoom*> RoomList;
-    typedef std::list<CUser*> UserList;
-
-    enum TYPE
-    {
-        NICK_NAME = 1,
-        CREATE_ROOM,
-        USERLIST,
-        ROOMLIST,
-        MAX
-    };
 
 private:
     SOCKET m_listenSocket;

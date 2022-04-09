@@ -72,10 +72,10 @@ void CSelect::Accept()
 	addrSize = sizeof(addrClient);
 	sockClient = accept(m_listenSocket, (SOCKADDR*)&addrClient, &addrSize);
 	m_fdSocketInfors.session_array[count] = new CSession(sockClient, addrClient);
-	FD_SET(sockClient, &m_fdSocketInfors);
+	FD_SET(sockClient, &m_fdSocketInfors); // 수정 : FD_SET_EX로 확장하여 사용
 }
 
 void CSelect::remove(CSession* _session)
 {
-	CInformation::GetInstance()->GetUserList()->remove(_session->GetUser());
+	CInformation::GetInstance()->RemoveUser(_session);
 };

@@ -1,21 +1,14 @@
 #pragma once
-#include "Information.h"
+#include "user.h"
+#include "Room.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
 #define BUFFER_MAX 1000
 
-/*
-enum ePacketType 
-{
-	CS_PT_NICKNAME = 0 ,
-	NICK_NAME = 1,
-	CREATE_ROOM,
-	USERLIST,
-	ROOMLIST,
-	MAX
-};
-*/
+// CUser : 게임속에서 player 의 정보 ( nickname , 승률 ... )
+
+// CSession : 연결되어 있는 client 정보 ( socket - recv, send )
 
 class CSession //커넥션, 세션
 {

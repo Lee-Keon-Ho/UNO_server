@@ -23,12 +23,12 @@ CInformation::~CInformation()
 
 }
 
-void CInformation::RemoveUser(CUser* _user)
+void CInformation::RemoveUser(CSession* _session)
 {
-	m_userList.remove(_user);
+	m_userList.remove(_session->GetUser());
 }
 
-void CInformation::RemoveRoom(CRoom* _room)
+void CInformation::RemoveRoom(CSession* _session)
 {
-	m_roomList.remove(_room);
+	//m_roomList.remove();
 }

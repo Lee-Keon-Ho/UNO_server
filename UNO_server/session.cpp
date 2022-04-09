@@ -1,4 +1,5 @@
 #include "session.h"
+#include "Information.h"
 #include <stdio.h>
 
 CSession::CSession()
@@ -50,7 +51,7 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_NICKNAME:
 		NickName();
 		break;
-	case CS_PT_CREATEROOM:
+	case CS_PT_CREATEROOM: // 성공 실패에 대한 send
 		CreateRoom();
 		break;
 	case CS_PT_USERLIST:
@@ -63,7 +64,7 @@ void CSession::HandlePacket(int _type)
 }
 
 
-void CSession::NickName()
+void CSession::NickName() // 처음으로 recv
 {
 	CInformation* pInformation = CInformation::GetInstance();
 	pInformation->GetUserList()->push_back(new CUser(m_buffer));
@@ -103,6 +104,8 @@ void CSession::CreateRoom()
 	int roomNum = roomList.size() + 1;
 
 	pInformation->GetRoomList()->push_back(new CRoom(roomNum, m_buffer));
+
+	//send 
 }
 
 
@@ -121,7 +124,7 @@ void CSession::UserList()
 
 	std::list<CUser*>::iterator iter = userList.begin();
 	int len = sizeof(CUser);
-	for (; iter != userList.end(); iter++) // 정확히 몇개가의 기준이 필요하다
+	for (; iter != userList.end(); iter++) // 첫 화면에는 15개만
 	{
 		memcpy(tempBuffer, *iter, len);
 		tempBuffer += len;
