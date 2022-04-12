@@ -12,16 +12,12 @@ CUser::~CUser()
 {
 }
 
-CUser::CUser(char* _recvBuffer)
+CUser::CUser(CUser* _recvBuffer)
 {
-	char* recvtemp = _recvBuffer + 4; // recvSize, type을 제외한 값
-	int len = strlen(recvtemp) + 1;
-	memcpy(m_pName, recvtemp, len);
-
-
-	for (int i = 0; i < len; i++)
-	{
-		printf("%d ", m_pName[i]);
-	}
-	printf("\n");
+	memcpy(this, _recvBuffer, sizeof(CUser));
+	//WCHAR* recvtemp = _recvBuffer + 4; // recvSize, type을 제외한 값
+	//int len = sizeof(WCHAR) * wcslen(recvtemp) + 1;
+	//memcpy(m_name, recvtemp, len);
+	
+	wprintf(L"%s \n", m_name);
 }

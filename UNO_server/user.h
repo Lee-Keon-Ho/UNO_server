@@ -1,4 +1,5 @@
 #pragma once
+#include <wchar.h>
 
 #define NAME_MAX 16
 
@@ -7,11 +8,11 @@ class CUser
 public:
 
 private:
-	char m_pName[NAME_MAX];
+	wchar_t m_name[NAME_MAX];
 public:
 	CUser();
 	~CUser();
-	CUser(char* _recvBuffer);
+	CUser(CUser* _recvBuffer);
 
-	char* GetName() { return m_pName; }
+	wchar_t* GetName() { return m_name; }
 };

@@ -1,6 +1,6 @@
 #include "select.h"
-
 #include <stdio.h>
+
 #pragma comment( lib, "ws2_32.lib")
 #define BUFFER_MAX 255
 
@@ -52,10 +52,7 @@ void CSelect::Update()
 					if (recvSize < 0)
 					{
 						remove(m_fdSocketInfors.session_array[i]);
-						delete m_fdSocketInfors.session_array[i];
-						m_fdSocketInfors.session_array[i] = nullptr;
 						FD_CLR_EX(sockTemp, &m_fdSocketInfors);
-
 					}
 				}
 			}
@@ -71,11 +68,10 @@ void CSelect::Accept()
 	int count = m_fdSocketInfors.fd_count;
 	addrSize = sizeof(addrClient);
 	sockClient = accept(m_listenSocket, (SOCKADDR*)&addrClient, &addrSize);
-	m_fdSocketInfors.session_array[count] = new CSession(sockClient, addrClient);
-	FD_SET(sockClient, &m_fdSocketInfors); // 수정 : FD_SET_EX로 확장하여 사용
+	FD_SET_EX(sockClient, new CSession(sockClient, addrClient),&m_fdSocketInfors);
 }
 
 void CSelect::remove(CSession* _session)
 {
-	CInformation::GetInstance()->RemoveUser(_session);
+	CUserManager::GetInstance()->Remove(_session->GetUser());
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include "Server.h"
-
 #include <stdio.h>
 
 #define MAX 64

@@ -36,7 +36,10 @@
     <ClCompile Include="User.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Information.cpp">
+    <ClCompile Include="userManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="roomManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +62,13 @@
     <ClInclude Include="User.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Information.h">
+    <ClInclude Include="userManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="roomManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UNO_server.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

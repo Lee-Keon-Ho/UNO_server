@@ -7,7 +7,7 @@ public:
 	struct stROOM
 	{
 		int number;
-		char name[64];
+		wchar_t name[32];
 		int playerCount;
 		int playerMax;
 		bool state;

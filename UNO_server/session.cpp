@@ -1,19 +1,24 @@
 #include "session.h"
-#include "Information.h"
+#include "roomManager.h"
+#include "userManager.h"
 #include <stdio.h>
 
 CSession::CSession()
 {
+	m_pUser = new CUser();
 }
 
 CSession::~CSession()
 {
+	if (m_pRoom) { delete m_pRoom; m_pRoom = nullptr; }
+	if (m_pUser) { delete m_pUser; m_pUser = nullptr; }
 }
 
 CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
-	
+	m_pUser = new CUser();
+	m_pRoom = new CRoom();
 }
 
 int CSession::Recv()
@@ -51,7 +56,7 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_NICKNAME:
 		NickName();
 		break;
-	case CS_PT_CREATEROOM: // 성공 실패에 대한 send
+	case CS_PT_CREATEROOM: // 수정 : 성공 실패에 대한 send
 		CreateRoom();
 		break;
 	case CS_PT_USERLIST:
@@ -66,11 +71,14 @@ void CSession::HandlePacket(int _type)
 
 void CSession::NickName() // 처음으로 recv
 {
-	CInformation* pInformation = CInformation::GetInstance();
-	pInformation->GetUserList()->push_back(new CUser(m_buffer));
+	CUserManager* pUserManager = CUserManager::GetInstance();
 
-	CInformation::UserList userList = *pInformation->GetUserList();
-	
+	memcpy(m_pUser, m_buffer + 4, sizeof(CUser));
+
+	pUserManager->GetUserList()->push_back(m_pUser);
+
+	CUserManager::userList_t userList = *pUserManager->GetUserList();
+
 	char sendBuffer[1000];
 	char* tempBuffer = sendBuffer;
 
@@ -97,13 +105,17 @@ void CSession::NickName() // 처음으로 recv
 
 void CSession::CreateRoom()
 {
-	CInformation* pInformation = CInformation::GetInstance();
-	
-	CInformation::RoomList roomList = *pInformation->GetRoomList();
+	CRoomManager* pRoomManager = CRoomManager::GetInstance();
+
+	CRoomManager::roomList_t roomList = *CRoomManager::GetInstance()->GetRoomList();
 	
 	int roomNum = roomList.size() + 1;
 
-	pInformation->GetRoomList()->push_back(new CRoom(roomNum, m_buffer));
+	//m_pRoom = new CRoom(roomNum, m_buffer);
+
+	// 여기부터 시작. 2022-04-12
+
+	pRoomManager->GetRoomList()->push_back(new CRoom(roomNum, m_buffer));
 
 	//send 
 }
@@ -111,7 +123,7 @@ void CSession::CreateRoom()
 
 void CSession::UserList()
 {
-	CInformation::UserList userList = *CInformation::GetInstance()->GetUserList();
+	CUserManager::userList_t userList = *CUserManager::GetInstance()->GetUserList();
 	char sendBuffer[1000];
 	char* tempBuffer = sendBuffer;
 
@@ -137,7 +149,7 @@ void CSession::UserList()
 
 void CSession::RoomList()
 {
-	CInformation::RoomList roomList = *CInformation::GetInstance()->GetRoomList();
+	CRoomManager::roomList_t roomList = *CRoomManager::GetInstance()->GetRoomList();
 	char sendBuffer[1000];
 	char* tempBuffer = sendBuffer;
 

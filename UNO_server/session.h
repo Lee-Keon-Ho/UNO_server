@@ -1,8 +1,8 @@
 #pragma once
-#include "user.h"
-#include "Room.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include "user.h"
+#include "Room.h"
 
 #define BUFFER_MAX 1000
 
@@ -27,8 +27,8 @@ private:
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
 
-	CUser* m_pUser; // 자신의 정보
-	CRoom* m_pRoom; // 자신이 만든 방의 정보가 필요한가?
+	CUser* m_pUser; 
+	CRoom* m_pRoom; 
 
 public:
 	CSession();
