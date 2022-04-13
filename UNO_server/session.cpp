@@ -18,7 +18,6 @@ CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
 	m_pUser = new CUser();
-	m_pRoom = new CRoom();
 }
 
 int CSession::Recv()
@@ -74,6 +73,7 @@ void CSession::NickName() // 처음으로 recv
 	CUserManager* pUserManager = CUserManager::GetInstance();
 
 	memcpy(m_pUser, m_buffer + 4, sizeof(CUser));
+	wprintf(L"%s \n", m_pUser->GetName());
 
 	pUserManager->GetUserList()->push_back(m_pUser);
 
@@ -111,11 +111,15 @@ void CSession::CreateRoom()
 	
 	int roomNum = roomList.size() + 1;
 
-	//m_pRoom = new CRoom(roomNum, m_buffer);
+	wchar_t tempBuffer[1000];
+
+	memcpy(tempBuffer, m_buffer, 1000);
+
+	m_pRoom = new CRoom(roomNum, tempBuffer + 4);
 
 	// 여기부터 시작. 2022-04-12
 
-	pRoomManager->GetRoomList()->push_back(new CRoom(roomNum, m_buffer));
+	pRoomManager->GetRoomList()->push_back(new CRoom(roomNum, tempBuffer));
 
 	//send 
 }

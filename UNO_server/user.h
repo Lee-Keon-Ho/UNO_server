@@ -12,7 +12,6 @@ private:
 public:
 	CUser();
 	~CUser();
-	CUser(CUser* _recvBuffer);
 
 	wchar_t* GetName() { return m_name; }
 };

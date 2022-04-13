@@ -17,7 +17,7 @@ private:
 
 public:
 	CRoom();
-	CRoom(int _number, char* _name);
+	CRoom(int _number, wchar_t* _name);
 	~CRoom();
 private:
 };
