@@ -115,13 +115,11 @@ void CSession::CreateRoom()
 
 	memcpy(tempBuffer, m_buffer, 1000);
 
-	m_pRoom = new CRoom(roomNum, tempBuffer + 4);
+	m_pRoom = new CRoom(roomNum, tempBuffer);
 
-	// 여기부터 시작. 2022-04-12
+	pRoomManager->GetRoomList()->push_back(m_pRoom);
 
-	pRoomManager->GetRoomList()->push_back(new CRoom(roomNum, tempBuffer));
-
-	//send 
+	//2022-04-14 수정 : send
 }
 
 
@@ -166,7 +164,7 @@ void CSession::RoomList()
 
 	std::list<CRoom*>::iterator iter = roomList.begin();
 	int len = sizeof(CRoom);
-	for(; iter != roomList.end(); iter++)
+	for(; iter != roomList.end(); iter++) // 보여지는 화면만
 	{
 		memcpy(tempBuffer, *iter, len);
 		tempBuffer += len;

@@ -9,7 +9,6 @@ public:
 		int number;
 		wchar_t name[32];
 		int playerCount;
-		int playerMax;
 		bool state;
 	};
 private:
