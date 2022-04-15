@@ -1,7 +1,7 @@
 #pragma once
 #include <wchar.h>
 
-#define NAME_MAX 16
+#define NAME_MAX 32
 
 class CUser
 {

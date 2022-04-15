@@ -19,6 +19,7 @@ public:
 		CS_PT_CREATEROOM,
 		CS_PT_USERLIST,
 		CS_PT_ROOMLIST,
+		CS_PT_DESTROYROOM,
 		CS_PT_MAX
 	};
 
@@ -28,7 +29,7 @@ private:
 	char m_buffer[BUFFER_MAX];
 
 	CUser* m_pUser; 
-	CRoom* m_pRoom; 
+	CRoom* m_pRoom;
 
 public:
 	CSession();
@@ -43,6 +44,7 @@ public:
 	void CreateRoom();
 	void UserList();
 	void RoomList();
+	void DestroyRoom();
 
 	CUser* GetUser() { return m_pUser; }
 private:

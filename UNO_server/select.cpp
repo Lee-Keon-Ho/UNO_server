@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #pragma comment( lib, "ws2_32.lib")
-#define BUFFER_MAX 255
 
 CSelect::CSelect()
 {

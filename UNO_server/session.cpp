@@ -6,6 +6,7 @@
 CSession::CSession()
 {
 	m_pUser = new CUser();
+	m_pRoom = new CRoom();
 }
 
 CSession::~CSession()
@@ -18,6 +19,7 @@ CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
 	m_pUser = new CUser();
+	m_pRoom = new CRoom();
 }
 
 int CSession::Recv()
@@ -64,6 +66,9 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_ROOMLIST:
 		RoomList();
 		break;
+	case CS_PT_DESTROYROOM:
+		DestroyRoom();
+		break;
 	}
 }
 
@@ -73,8 +78,8 @@ void CSession::NickName() // 처음으로 recv
 	CUserManager* pUserManager = CUserManager::GetInstance();
 
 	memcpy(m_pUser, m_buffer + 4, sizeof(CUser));
-	wprintf(L"%s \n", m_pUser->GetName());
-
+	wprintf(L"%s", m_pUser->GetName());
+	printf(" 서버 접속\n");
 	pUserManager->GetUserList()->push_back(m_pUser);
 
 	CUserManager::userList_t userList = *pUserManager->GetUserList();
@@ -111,11 +116,12 @@ void CSession::CreateRoom()
 	
 	int roomNum = roomList.size() + 1;
 
-	wchar_t tempBuffer[1000];
+	memcpy(m_pRoom, m_buffer + 4, sizeof(CRoom));
 
-	memcpy(tempBuffer, m_buffer, 1000);
+	m_pRoom->SetNumber(roomNum);
 
-	m_pRoom = new CRoom(roomNum, tempBuffer);
+	wprintf(L"%s", m_pRoom->GetName());
+	printf(" 방 생성\n");
 
 	pRoomManager->GetRoomList()->push_back(m_pRoom);
 
@@ -146,6 +152,8 @@ void CSession::UserList()
 
 	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
 
+	printf("UserList 갱신\n");
+
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
@@ -164,7 +172,7 @@ void CSession::RoomList()
 
 	std::list<CRoom*>::iterator iter = roomList.begin();
 	int len = sizeof(CRoom);
-	for(; iter != roomList.end(); iter++) // 보여지는 화면만
+	for(; iter != roomList.end(); iter++) // 수정 : 보여지는 화면만
 	{
 		memcpy(tempBuffer, *iter, len);
 		tempBuffer += len;
@@ -172,5 +180,21 @@ void CSession::RoomList()
 
 	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
 
+	printf("RoomList 갱신\n");
+
 	send(m_socket, sendBuffer, bufferSize, 0);
+}
+
+void CSession::DestroyRoom()
+{
+	CRoomManager* pRoomManager = CRoomManager::GetInstance();
+
+	CRoomManager::roomList_t roomList = *CRoomManager::GetInstance()->GetRoomList();
+
+	wprintf(L"%s", m_pRoom->GetName());
+	printf(" 방 파괴\n");
+
+	roomList.remove(m_pRoom);
+
+	//send 수정
 }

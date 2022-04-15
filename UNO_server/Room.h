@@ -7,7 +7,7 @@ public:
 	struct stROOM
 	{
 		int number;
-		wchar_t name[32];
+		wchar_t name[64];
 		int playerCount;
 		bool state;
 	};
@@ -16,7 +16,9 @@ private:
 
 public:
 	CRoom();
-	CRoom(int _number, wchar_t* _name);
 	~CRoom();
+
+	void SetNumber(int _num);
+	wchar_t* GetName() { return m_room.name; }
 private:
 };
