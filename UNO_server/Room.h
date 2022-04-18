@@ -20,5 +20,6 @@ public:
 
 	void SetNumber(int _num);
 	wchar_t* GetName() { return m_room.name; }
+	stROOM* GetInfo() { return &m_room; }
 private:
 };

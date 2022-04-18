@@ -2,7 +2,6 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include "user.h"
-#include "Room.h"
 
 #define BUFFER_MAX 1000
 
@@ -15,7 +14,7 @@ class CSession //目池记, 技记
 public:
 	enum ePacketType
 	{
-		CS_PT_NICKNAME = 1,
+		CS_PT_LOGIN = 1,
 		CS_PT_CREATEROOM,
 		CS_PT_USERLIST,
 		CS_PT_ROOMLIST,
@@ -27,9 +26,7 @@ private:
 	SOCKET m_socket;
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
-
 	CUser* m_pUser; 
-	CRoom* m_pRoom;
 
 public:
 	CSession();
@@ -40,7 +37,7 @@ public:
 	int Recv();
 	void HandlePacket(int _type);
 
-	void NickName();
+	void Login();
 	void CreateRoom();
 	void UserList();
 	void RoomList();

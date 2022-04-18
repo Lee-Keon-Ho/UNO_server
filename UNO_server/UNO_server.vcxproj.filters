@@ -68,7 +68,7 @@
     <ClInclude Include="roomManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="UNO_server.h">
+    <ClInclude Include="fd_set_ex.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

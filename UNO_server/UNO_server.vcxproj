@@ -156,7 +156,7 @@
     <ClInclude Include="select.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="session.h" />
-    <ClInclude Include="UNO_server.h" />
+    <ClInclude Include="fd_set_ex.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="userManager.h" />
   </ItemGroup>

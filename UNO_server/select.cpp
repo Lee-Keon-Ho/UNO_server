@@ -46,7 +46,6 @@ void CSelect::Update()
 				}
 				else
 				{
-					//recvSize = Recv(sockTemp);
 					recvSize = m_fdSocketInfors.session_array[i]->Recv();
 					if (recvSize < 0)
 					{

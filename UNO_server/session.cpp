@@ -6,20 +6,18 @@
 CSession::CSession()
 {
 	m_pUser = new CUser();
-	m_pRoom = new CRoom();
 }
 
 CSession::~CSession()
 {
-	if (m_pRoom) { delete m_pRoom; m_pRoom = nullptr; }
 	if (m_pUser) { delete m_pUser; m_pUser = nullptr; }
+	closesocket(m_socket);
 }
 
 CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
 	m_pUser = new CUser();
-	m_pRoom = new CRoom();
 }
 
 int CSession::Recv()
@@ -43,7 +41,8 @@ int CSession::Recv()
 		if (recvedSize > 0)
 		{
 			memcpy(m_buffer, m_buffer + packetSize, recvedSize);
-			recvedSize = m_buffer[0];
+			packetSize = *(unsigned short*)m_buffer;
+			type = *(unsigned short*)(m_buffer + 2);
 		}
 	}
 
@@ -54,10 +53,10 @@ void CSession::HandlePacket(int _type)
 {
 	switch(_type)
 	{
-	case CS_PT_NICKNAME:
-		NickName();
+	case CS_PT_LOGIN:
+		Login();
 		break;
-	case CS_PT_CREATEROOM: // 수정 : 성공 실패에 대한 send
+	case CS_PT_CREATEROOM:
 		CreateRoom();
 		break;
 	case CS_PT_USERLIST:
@@ -73,7 +72,7 @@ void CSession::HandlePacket(int _type)
 }
 
 
-void CSession::NickName() // 처음으로 recv
+void CSession::Login()
 {
 	CUserManager* pUserManager = CUserManager::GetInstance();
 
@@ -91,7 +90,7 @@ void CSession::NickName() // 처음으로 recv
 
 	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
 	tempBuffer += sizeof(unsigned short);
-	*(unsigned short*)tempBuffer = CS_PT_NICKNAME;
+	*(unsigned short*)tempBuffer = CS_PT_LOGIN;
 	tempBuffer += sizeof(unsigned short);
 
 	std::list<CUser*>::iterator iter = userList.begin();
@@ -102,7 +101,7 @@ void CSession::NickName() // 처음으로 recv
 		tempBuffer += len;
 	}
 
-	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
+	int bufferSize = tempBuffer - sendBuffer;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
@@ -116,16 +115,12 @@ void CSession::CreateRoom()
 	
 	int roomNum = roomList.size() + 1;
 
-	memcpy(m_pRoom, m_buffer + 4, sizeof(CRoom));
+	m_pUser->SetRoomInfo(m_buffer + 4, roomNum);
 
-	m_pRoom->SetNumber(roomNum);
-
-	wprintf(L"%s", m_pRoom->GetName());
+	wprintf(L"%s", m_pUser->GetName());
 	printf(" 방 생성\n");
 
-	pRoomManager->GetRoomList()->push_back(m_pRoom);
-
-	//2022-04-14 수정 : send
+	pRoomManager->GetRoomList()->push_back(m_pUser->GetRoom());
 }
 
 
@@ -150,8 +145,9 @@ void CSession::UserList()
 		tempBuffer += len;
 	}
 
-	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
+	int bufferSize = tempBuffer - sendBuffer;
 
+	wprintf(L"%s ", m_pUser->GetName());
 	printf("UserList 갱신\n");
 
 	send(m_socket, sendBuffer, bufferSize, 0);
@@ -165,21 +161,22 @@ void CSession::RoomList()
 
 	int listSize = roomList.size();
 
-	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CRoom) * listSize);
+	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CRoom::stROOM) * listSize);
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_ROOMLIST;
 	tempBuffer += sizeof(unsigned short);
 
 	std::list<CRoom*>::iterator iter = roomList.begin();
-	int len = sizeof(CRoom);
-	for(; iter != roomList.end(); iter++) // 수정 : 보여지는 화면만
+	int len = sizeof(CRoom::stROOM);
+	for(; iter != roomList.end(); iter++) // 수정 : 보여지는 화면만 8개
 	{
-		memcpy(tempBuffer, *iter, len);
+		memcpy(tempBuffer, (*iter)->GetInfo(), len);
 		tempBuffer += len;
 	}
 
-	int bufferSize = tempBuffer - sendBuffer + (len * listSize);
+	int bufferSize = tempBuffer - sendBuffer;
 
+	wprintf(L"%s ", m_pUser->GetName());
 	printf("RoomList 갱신\n");
 
 	send(m_socket, sendBuffer, bufferSize, 0);
@@ -189,12 +186,12 @@ void CSession::DestroyRoom()
 {
 	CRoomManager* pRoomManager = CRoomManager::GetInstance();
 
-	CRoomManager::roomList_t roomList = *CRoomManager::GetInstance()->GetRoomList();
+	CRoomManager::roomList_t* roomList = pRoomManager->GetRoomList();
 
-	wprintf(L"%s", m_pRoom->GetName());
+	wprintf(L"%s", m_pUser->GetName());
 	printf(" 방 파괴\n");
 
-	roomList.remove(m_pRoom);
-
+	m_pUser->DestroyRoom(roomList);
+	
 	//send 수정
 }
