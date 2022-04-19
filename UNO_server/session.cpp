@@ -76,7 +76,8 @@ void CSession::Login()
 {
 	CUserManager* pUserManager = CUserManager::GetInstance();
 
-	memcpy(m_pUser, m_buffer + 4, sizeof(CUser));
+	m_pUser->SetName(m_buffer + 4);
+
 	wprintf(L"%s", m_pUser->GetName());
 	printf(" 서버 접속\n");
 	pUserManager->GetUserList()->push_back(m_pUser);
@@ -88,16 +89,17 @@ void CSession::Login()
 
 	int listSize = userList.size();
 
-	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
+	int len = sizeof(wchar_t) * NAME_MAX;
+
+	*(unsigned short*)tempBuffer = 2 + 2 + (len * listSize);
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_LOGIN;
 	tempBuffer += sizeof(unsigned short);
 
 	std::list<CUser*>::iterator iter = userList.begin();
-	int len = sizeof(CUser);
 	for (; iter != userList.end(); iter++)
 	{
-		memcpy(tempBuffer, *iter, len);
+		memcpy(tempBuffer, (*iter)->GetName(), len);
 		tempBuffer += len;
 	}
 
@@ -111,9 +113,37 @@ void CSession::CreateRoom()
 {
 	CRoomManager* pRoomManager = CRoomManager::GetInstance();
 
-	CRoomManager::roomList_t roomList = *CRoomManager::GetInstance()->GetRoomList();
+	CRoomManager::roomList_t roomList = *pRoomManager->GetRoomList();
 	
-	int roomNum = roomList.size() + 1;
+	int roomNum = roomList.size();
+	CRoomManager::roomList_t::iterator iter = roomList.begin();
+
+	// 2022-04-19 수정 : test 좀 더 좋은 방법을 생각해보자
+	if (roomNum == 0)
+	{
+		roomNum = 1;
+	}
+	else if (roomNum == 1)
+	{
+		if ((*iter)->GetInfo()->number != 1)
+		{
+			roomNum = 1;
+		}
+		else
+		{
+			roomNum = 2;
+		}
+	}
+	else
+	{
+		for (int i = 2; iter != roomList.end(); iter++, i++)
+		{
+			if ((*iter)->GetInfo()->number != i)
+			{
+				roomNum = i;
+			}
+		}
+	}
 
 	m_pUser->SetRoomInfo(m_buffer + 4, roomNum);
 
@@ -132,16 +162,17 @@ void CSession::UserList()
 
 	int listSize = userList.size();
 
-	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CUser) * listSize);
+	int len = sizeof(wchar_t) * NAME_MAX;
+
+	*(unsigned short*)tempBuffer = 2 + 2 + (len * listSize);
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_USERLIST;
 	tempBuffer += sizeof(unsigned short);
 
 	std::list<CUser*>::iterator iter = userList.begin();
-	int len = sizeof(CUser);
 	for (; iter != userList.end(); iter++) // 첫 화면에는 15개만
 	{
-		memcpy(tempBuffer, *iter, len);
+		memcpy(tempBuffer, (*iter)->GetName(), len);
 		tempBuffer += len;
 	}
 
