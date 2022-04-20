@@ -16,9 +16,9 @@ public:
 	~CUser();
 
 	void SetName(char* _name);
+	void SetRoom(CRoom* _room);
 	wchar_t* GetName() { return m_name; }
 	CRoom* GetRoom() { return m_pRoom; }
-	CRoom::stROOM* GetRoomInfo() { return m_pRoom->GetInfo(); }
 	void SetRoomInfo(char* _buffer, int _number);
 	void DestroyRoom(CRoomManager::roomList_t* _roomList);
 };

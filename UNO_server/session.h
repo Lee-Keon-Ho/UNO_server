@@ -20,6 +20,7 @@ public:
 		CS_PT_ROOMLIST,
 		CS_PT_DESTROYROOM,
 		CS_PT_INROOM,
+		CS_PT_ROOMSTATE,
 		CS_PT_MAX
 	};
 
@@ -43,6 +44,8 @@ public:
 	void UserList();
 	void RoomList();
 	void DestroyRoom();
+	void InRoom();
+	void RoomState();
 
 	CUser* GetUser() { return m_pUser; }
 private:

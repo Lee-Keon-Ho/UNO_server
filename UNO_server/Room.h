@@ -18,7 +18,9 @@ public:
 	CRoom();
 	~CRoom();
 
-	void SetNumber(int _num);
+	void InPlayer() { m_room.playerCount += 1; }
+
+	void SetInfo(char* _buffer, int _num);
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
 private:

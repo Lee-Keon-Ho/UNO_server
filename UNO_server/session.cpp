@@ -68,6 +68,12 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_DESTROYROOM:
 		DestroyRoom();
 		break;
+	case CS_PT_INROOM:
+		InRoom();
+		break;
+	case CS_PT_ROOMSTATE:
+		RoomState();
+		break;
 	}
 }
 
@@ -191,14 +197,15 @@ void CSession::RoomList()
 	char* tempBuffer = sendBuffer;
 
 	int listSize = roomList.size();
+	int len = sizeof(CRoom::stROOM);
 
-	*(unsigned short*)tempBuffer = 2 + 2 + (sizeof(CRoom::stROOM) * listSize);
+	*(unsigned short*)tempBuffer = 2 + 2 + (len * listSize);
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_ROOMLIST;
 	tempBuffer += sizeof(unsigned short);
 
 	std::list<CRoom*>::iterator iter = roomList.begin();
-	int len = sizeof(CRoom::stROOM);
+	
 	for(; iter != roomList.end(); iter++) // 수정 : 보여지는 화면만 8개
 	{
 		memcpy(tempBuffer, (*iter)->GetInfo(), len);
@@ -225,4 +232,37 @@ void CSession::DestroyRoom()
 	m_pUser->DestroyRoom(roomList);
 	
 	//send 수정
+}
+
+void CSession::InRoom()
+{
+	CRoomManager::roomList_t* room = CRoomManager::GetInstance()->GetRoomList();
+	CRoomManager::roomList_t::iterator iter = room->begin();
+	for(; iter != room->end(); iter++)
+	{
+		if ((*iter)->GetInfo()->number == m_buffer[4])
+		{
+			(*iter)->InPlayer();
+			m_pUser->SetRoom((*iter));
+		}
+	}
+}
+
+void CSession::RoomState()
+{
+	char sendBuffer[1000];
+	char* tempBuffer = sendBuffer;
+
+	int len = sizeof(CRoom::stROOM);
+
+	*(unsigned short*)tempBuffer = 2 + 2 + len;
+	tempBuffer += sizeof(unsigned short);
+	*(unsigned short*)tempBuffer = CS_PT_ROOMSTATE;
+	tempBuffer += sizeof(unsigned short);
+
+	memcpy(tempBuffer, m_pUser->GetRoom()->GetInfo(), len);
+
+	int bufferSize = tempBuffer - sendBuffer + len;
+
+	send(m_socket, sendBuffer, bufferSize, 0);
 }
