@@ -1,4 +1,5 @@
 #include "User.h"
+#include "roomManager.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -28,7 +29,8 @@ void CUser::SetRoomInfo(char* _buffer, int _number)
 	m_pRoom->SetInfo(_buffer, _number);	
 }
 
-void CUser::DestroyRoom(CRoomManager::roomList_t* _roomList)
+void CUser::DestroyRoom()
 {
-	_roomList->remove(m_pRoom);
+	CRoomManager::GetInstance()->GetRoomList()->remove(m_pRoom);
+	if (m_pRoom) { delete m_pRoom; m_pRoom = nullptr; }
 }

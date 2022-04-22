@@ -229,7 +229,7 @@ void CSession::DestroyRoom()
 	wprintf(L"%s", m_pUser->GetName());
 	printf(" 방 파괴\n");
 
-	m_pUser->DestroyRoom(roomList);
+	m_pUser->DestroyRoom();
 	
 	//send 수정
 }
@@ -240,7 +240,7 @@ void CSession::InRoom()
 	CRoomManager::roomList_t::iterator iter = room->begin();
 	for(; iter != room->end(); iter++)
 	{
-		if ((*iter)->GetInfo()->number == m_buffer[4])
+		if ((*iter)->GetInfo()->number == m_buffer[4]) // 2022-04-22 수정 : test
 		{
 			(*iter)->InPlayer();
 			m_pUser->SetRoom((*iter));
