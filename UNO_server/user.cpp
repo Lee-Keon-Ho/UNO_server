@@ -5,7 +5,7 @@
 
 CUser::CUser()
 {
-	m_pRoom = new CRoom();
+	m_pRoom = new CRoom(); // 2022-04-23 class : 멍청아 이거 아니다!!
 }
 
 CUser::~CUser()

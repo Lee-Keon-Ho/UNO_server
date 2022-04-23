@@ -41,6 +41,7 @@ int CSession::Recv()
 		if (recvedSize > 0)
 		{
 			memcpy(m_buffer, m_buffer + packetSize, recvedSize);
+			// 2022-04-23 class : 바꿔야한다. 값이 unsigned short 아니면
 			packetSize = *(unsigned short*)m_buffer;
 			type = *(unsigned short*)(m_buffer + 2);
 		}
@@ -125,6 +126,7 @@ void CSession::CreateRoom()
 	CRoomManager::roomList_t::iterator iter = roomList.begin();
 
 	// 2022-04-19 수정 : test 좀 더 좋은 방법을 생각해보자
+	// 2022-04-23 class 완전히 새롭게 수정.
 	if (roomNum == 0)
 	{
 		roomNum = 1;

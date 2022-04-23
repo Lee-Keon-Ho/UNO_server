@@ -49,7 +49,7 @@ void CSelect::Update()
 					recvSize = m_fdSocketInfors.session_array[i]->Recv();
 					if (recvSize < 0)
 					{
-						m_fdSocketInfors.session_array[i]->DestroyRoom();
+						m_fdSocketInfors.session_array[i]->DestroyRoom(); // 2022-04-23 class : 필요없음
 						remove(m_fdSocketInfors.session_array[i]);
 						FD_CLR_EX(sockTemp, &m_fdSocketInfors);
 					}

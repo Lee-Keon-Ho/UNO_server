@@ -12,7 +12,7 @@
 class CSession //커넥션, 세션
 {
 public:
-	enum ePacketType
+	enum ePacketType // 2022-04-23 class : 따로 때보자.
 	{
 		CS_PT_LOGIN = 1,
 		CS_PT_CREATEROOM,

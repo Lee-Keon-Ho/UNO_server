@@ -13,7 +13,7 @@ private:
 	~CRoomManager();
 
 public:
-	typedef std::list<CRoom*> roomList_t;
+	typedef std::list<CRoom*> roomList_t; // 호텔이다
 
 private:
 	roomList_t m_roomList;

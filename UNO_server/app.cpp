@@ -3,7 +3,7 @@
 
 CApp::CApp()
 {
-	m_pServer = new CServer();
+	m_pServer = new CServer(); // 2022-04-23 class : 안좋음.. 그냥 들고 있어도 된다.
 }
 
 CApp::~CApp()
