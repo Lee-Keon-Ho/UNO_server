@@ -1,28 +1,25 @@
 #pragma once
 #include "Room.h"
-#include <list>
+#include <vector>
 
-/*create 2022 - 04 - 12
-	room만 관리하기 위해서
-*/
+// 2022-04-25 수정
 class CRoomManager
 {
-private:
-	static CRoomManager* pInstance;
-	CRoomManager();
-	~CRoomManager();
-
 public:
-	typedef std::list<CRoom*> roomList_t; // 호텔이다
+	typedef std::vector<CRoom*> roomList_t; // 호텔이다
 
 private:
 	roomList_t m_roomList;
-
+	int m_count;
 public:
+	CRoomManager();
+	~CRoomManager();
+
+	CRoom* CreateRoom(char* _buffer);
+	void ResetRoom(int _num);
+	void OutRoom(int _num);
+
+	int GetCount() { return m_count; }
+
 	roomList_t* GetRoomList() { return &m_roomList; }
-	void Remove(CRoom* _room);
-
-public:
-	static CRoomManager* GetInstance();
-	static void DeleteInstance();
 };

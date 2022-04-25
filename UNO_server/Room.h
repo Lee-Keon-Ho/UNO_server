@@ -1,6 +1,5 @@
 #pragma once
 
-// ¹æ ÇÏ³ª
 class CRoom
 {
 public:
@@ -16,11 +15,17 @@ private:
 
 public:
 	CRoom();
+	CRoom(int num);
 	~CRoom();
 
+	void CreateRoom(char* _buffer);
+	void OutRoom();
+	void ResetInfo();
 	void InPlayer() { m_room.playerCount += 1; }
 
-	void SetInfo(char* _buffer, int _num);
+	void SetInfo(char* _buffer);
+	int GetNumber() { return m_room.number; }
+	int GetPlayerCount() { return m_room.playerCount; }
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
 private:

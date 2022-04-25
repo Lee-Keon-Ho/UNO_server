@@ -1,8 +1,7 @@
 #pragma once
-#include "fd_set_ex.h" // 2022-04-12 이름이 많이 이상한데 뭐라고 해야하지?
+#include "fd_set_ex.h"
 #include "userManager.h"
-#include "Room.h"
-#include "user.h"
+#include "roomManager.h"
 
 class CSelect
 {
@@ -11,7 +10,12 @@ public:
 private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;
+    CRoomManager* m_roomManager;
 
+    fd_set  fdReads;
+    SOCKET  sockTemp;
+    int     iRet;
+    int     recvSize;
 public:
 	CSelect();
 	~CSelect();

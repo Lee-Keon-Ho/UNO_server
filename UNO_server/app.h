@@ -8,7 +8,7 @@ class CApp
 {
 public:
 private:
-	CServer* m_pServer;
+	CServer m_server;
 public:
 	CApp();
 	~CApp();

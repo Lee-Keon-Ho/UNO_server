@@ -56,6 +56,7 @@ bool CServer::Initialize(const char* _ip, int _port)
 
 void CServer::Cleanup()
 {
+	if (m_select) { delete m_select; m_select = nullptr; }
 	closesocket(m_listenSocket);
 	WSACleanup();
 }

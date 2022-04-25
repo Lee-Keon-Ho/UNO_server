@@ -2,6 +2,7 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include "user.h"
+#include "RoomManager.h"
 
 #define BUFFER_MAX 1000
 
@@ -12,24 +13,15 @@
 class CSession //커넥션, 세션
 {
 public:
-	enum ePacketType // 2022-04-23 class : 따로 때보자.
-	{
-		CS_PT_LOGIN = 1,
-		CS_PT_CREATEROOM,
-		CS_PT_USERLIST,
-		CS_PT_ROOMLIST,
-		CS_PT_DESTROYROOM,
-		CS_PT_INROOM,
-		CS_PT_OUTROOM,
-		CS_PT_ROOMSTATE,
-		CS_PT_MAX
-	};
+	typedef std::vector<CRoom*> roomList_t;
 
 private:
 	SOCKET m_socket;
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
+
 	CUser* m_pUser; 
+	CRoomManager* m_pRoomManager;
 
 public:
 	CSession();
@@ -40,13 +32,9 @@ public:
 	int Recv();
 	void HandlePacket(int _type);
 
-	void Login();
-	void CreateRoom();
-	void UserList();
 	void RoomList();
-	void DestroyRoom();
-	void InRoom();
-	void RoomState();
+	void Login();
+	void UserList();
 
 	CUser* GetUser() { return m_pUser; }
 private:

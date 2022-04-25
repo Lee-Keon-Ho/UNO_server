@@ -1,6 +1,7 @@
 #include "session.h"
-#include "roomManager.h"
+#include "RoomBuffer.h"
 #include "userManager.h"
+#include "PacketType.h"
 #include <stdio.h>
 
 CSession::CSession()
@@ -18,6 +19,7 @@ CSession::CSession(SOCKET _socket, SOCKADDR_IN& _addr)
 	: m_socket(_socket), m_addr(_addr)
 {
 	m_pUser = new CUser();
+	m_pRoomManager = CRoomBuffer::GetInstance()->GetRoomManager();
 }
 
 int CSession::Recv()
@@ -41,9 +43,17 @@ int CSession::Recv()
 		if (recvedSize > 0)
 		{
 			memcpy(m_buffer, m_buffer + packetSize, recvedSize);
-			// 2022-04-23 class : 바꿔야한다. 값이 unsigned short 아니면
-			packetSize = *(unsigned short*)m_buffer;
-			type = *(unsigned short*)(m_buffer + 2);
+
+			// 2022-04-25 수정 : unsigned short 값이면 packetSize
+			if (recvedSize > 1) 
+			{
+				packetSize = *(unsigned short*)m_buffer;
+			}
+			// 2022-04-25 수정 : recvedSize가 3초과면 type까지 알 수 있다.
+			if (recvedSize > 3)
+			{
+				type = *(unsigned short*)(m_buffer + 2);
+			}
 		}
 	}
 
@@ -58,22 +68,30 @@ void CSession::HandlePacket(int _type)
 		Login();
 		break;
 	case CS_PT_CREATEROOM:
-		CreateRoom();
+		wprintf(L"%s", m_pUser->GetName());
+		printf(" 방 생성\n");
+		m_pUser->SetRoom(CRoomBuffer::GetInstance()->CreateRoom(m_buffer));
 		break;
 	case CS_PT_USERLIST:
 		UserList();
 		break;
 	case CS_PT_ROOMLIST:
+		wprintf(L"%s ", m_pUser->GetName());
+		printf("RoomList 갱신\n");
 		RoomList();
 		break;
-	case CS_PT_DESTROYROOM:
-		DestroyRoom();
-		break;
 	case CS_PT_INROOM:
-		InRoom();
+		wprintf(L"%s ", m_pUser->GetName());
+		printf("InRoom\n");
+		CRoomBuffer::GetInstance()->InRoom();
+		break;
+	case CS_PT_OUTROOM:
+		wprintf(L"%s ", m_pUser->GetName());
+		printf("OutRoom\n");
+		CRoomBuffer::GetInstance()->OutRoom(m_pUser->GetNumber());
 		break;
 	case CS_PT_ROOMSTATE:
-		RoomState();
+		CRoomBuffer::GetInstance()->RoomState();
 		break;
 	}
 }
@@ -115,53 +133,6 @@ void CSession::Login()
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
-
-void CSession::CreateRoom()
-{
-	CRoomManager* pRoomManager = CRoomManager::GetInstance();
-
-	CRoomManager::roomList_t roomList = *pRoomManager->GetRoomList();
-	
-	int roomNum = roomList.size();
-	CRoomManager::roomList_t::iterator iter = roomList.begin();
-
-	// 2022-04-19 수정 : test 좀 더 좋은 방법을 생각해보자
-	// 2022-04-23 class 완전히 새롭게 수정.
-	if (roomNum == 0)
-	{
-		roomNum = 1;
-	}
-	else if (roomNum == 1)
-	{
-		if ((*iter)->GetInfo()->number != 1)
-		{
-			roomNum = 1;
-		}
-		else
-		{
-			roomNum = 2;
-		}
-	}
-	else
-	{
-		for (int i = 2; iter != roomList.end(); iter++, i++)
-		{
-			if ((*iter)->GetInfo()->number != i)
-			{
-				roomNum = i;
-			}
-		}
-	}
-
-	m_pUser->SetRoomInfo(m_buffer + 4, roomNum);
-
-	wprintf(L"%s", m_pUser->GetName());
-	printf(" 방 생성\n");
-
-	pRoomManager->GetRoomList()->push_back(m_pUser->GetRoom());
-}
-
-
 void CSession::UserList()
 {
 	CUserManager::userList_t userList = *CUserManager::GetInstance()->GetUserList();
@@ -192,13 +163,14 @@ void CSession::UserList()
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
+
 void CSession::RoomList()
 {
-	CRoomManager::roomList_t roomList = *CRoomManager::GetInstance()->GetRoomList();
+	roomList_t* roomList = m_pRoomManager->GetRoomList();
 	char sendBuffer[1000];
 	char* tempBuffer = sendBuffer;
 
-	int listSize = roomList.size();
+	int listSize = m_pRoomManager->GetCount();
 	int len = sizeof(CRoom::stROOM);
 
 	*(unsigned short*)tempBuffer = 2 + 2 + (len * listSize);
@@ -206,9 +178,9 @@ void CSession::RoomList()
 	*(unsigned short*)tempBuffer = CS_PT_ROOMLIST;
 	tempBuffer += sizeof(unsigned short);
 
-	std::list<CRoom*>::iterator iter = roomList.begin();
-	
-	for(; iter != roomList.end(); iter++) // 수정 : 보여지는 화면만 8개
+	std::vector<CRoom*>::iterator iter = roomList->begin();
+	int roomCount = m_pRoomManager->GetCount();
+	for(int i = 0; i < roomCount; iter++, i++) // 2022-04-25 수정 : 보여지는 화면만 8개(i 값은 추후에 변경)
 	{
 		memcpy(tempBuffer, (*iter)->GetInfo(), len);
 		tempBuffer += len;
@@ -216,13 +188,10 @@ void CSession::RoomList()
 
 	int bufferSize = tempBuffer - sendBuffer;
 
-	wprintf(L"%s ", m_pUser->GetName());
-	printf("RoomList 갱신\n");
-
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
-void CSession::DestroyRoom()
+/*void CSession::DestroyRoom()
 {
 	CRoomManager* pRoomManager = CRoomManager::GetInstance();
 
@@ -234,9 +203,9 @@ void CSession::DestroyRoom()
 	m_pUser->DestroyRoom();
 	
 	//send 수정
-}
+}*/
 
-void CSession::InRoom()
+/*void CSession::InRoom()
 {
 	CRoomManager::roomList_t* room = CRoomManager::GetInstance()->GetRoomList();
 	CRoomManager::roomList_t::iterator iter = room->begin();
@@ -267,4 +236,4 @@ void CSession::RoomState()
 	int bufferSize = tempBuffer - sendBuffer + len;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
-}
+}*/
