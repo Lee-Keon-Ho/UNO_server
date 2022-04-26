@@ -32,8 +32,9 @@ void CRoomBuffer::DestroyRoom()
 {
 }
 
-void CRoomBuffer::InRoom()
+CRoom* CRoomBuffer::InRoom(char* _buffer)
 {
+	return m_pRoomManager->InRoom(_buffer);
 }
 
 void CRoomBuffer::RoomState()

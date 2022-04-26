@@ -21,7 +21,7 @@ private:
 	char m_buffer[BUFFER_MAX];
 
 	CUser* m_pUser; 
-	CRoomManager* m_pRoomManager;
+	CRoomManager* m_pRoomManager; // rooms??
 
 public:
 	CSession();

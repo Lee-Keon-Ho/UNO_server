@@ -5,8 +5,6 @@
 
 class CSelect
 {
-public:
-
 private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;

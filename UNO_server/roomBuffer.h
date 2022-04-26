@@ -16,7 +16,7 @@ public:
 public:
 	CRoom* CreateRoom(char* _buffer);
 	void DestroyRoom();
-	void InRoom();
+	CRoom* InRoom(char* _buffer);
 	void RoomState();
 	void OutRoom(int _num);
 

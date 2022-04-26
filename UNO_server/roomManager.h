@@ -16,7 +16,7 @@ public:
 	~CRoomManager();
 
 	CRoom* CreateRoom(char* _buffer);
-	void ResetRoom(int _num);
+	CRoom* InRoom(char* _buffer);
 	void OutRoom(int _num);
 
 	int GetCount() { return m_count; }

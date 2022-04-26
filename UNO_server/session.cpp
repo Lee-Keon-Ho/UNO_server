@@ -83,12 +83,12 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_INROOM:
 		wprintf(L"%s ", m_pUser->GetName());
 		printf("InRoom\n");
-		CRoomBuffer::GetInstance()->InRoom();
+		m_pUser->SetRoom(CRoomBuffer::GetInstance()->InRoom(m_buffer));
 		break;
 	case CS_PT_OUTROOM:
 		wprintf(L"%s ", m_pUser->GetName());
 		printf("OutRoom\n");
-		CRoomBuffer::GetInstance()->OutRoom(m_pUser->GetNumber());
+		CRoomBuffer::GetInstance()->OutRoom(m_pUser->GetRoomNumber());
 		break;
 	case CS_PT_ROOMSTATE:
 		CRoomBuffer::GetInstance()->RoomState();
@@ -205,20 +205,7 @@ void CSession::RoomList()
 	//send 수정
 }*/
 
-/*void CSession::InRoom()
-{
-	CRoomManager::roomList_t* room = CRoomManager::GetInstance()->GetRoomList();
-	CRoomManager::roomList_t::iterator iter = room->begin();
-	for(; iter != room->end(); iter++)
-	{
-		if ((*iter)->GetInfo()->number == m_buffer[4]) // 2022-04-22 수정 : test
-		{
-			(*iter)->InPlayer();
-			m_pUser->SetRoom((*iter));
-		}
-	}
-}
-
+/*
 void CSession::RoomState()
 {
 	char sendBuffer[1000];

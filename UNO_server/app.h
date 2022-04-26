@@ -6,7 +6,6 @@
 
 class CApp
 {
-public:
 private:
 	CServer m_server;
 public:

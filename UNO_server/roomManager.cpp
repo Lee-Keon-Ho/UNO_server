@@ -27,12 +27,18 @@ CRoom* CRoomManager::CreateRoom(char* _buffer)
 	}
 }
 
-void CRoomManager::ResetRoom(int _num)
+CRoom* CRoomManager::InRoom(char* _buffer)
 {
-	m_roomList[_num]->ResetInfo();
+	char* tempBuffer = _buffer + 4;
+	int number = *(unsigned short*)tempBuffer;
+	tempBuffer += sizeof(unsigned short);
+	m_roomList[number]->InPlayer(tempBuffer);
+	return m_roomList[number];
 }
 
 void CRoomManager::OutRoom(int _num)
 {
-	m_roomList[_num]->OutRoom();
+	m_roomList[_num - 1]->OutRoom();
+	m_count--;
+	if (m_count < 0) m_count = 0;
 }

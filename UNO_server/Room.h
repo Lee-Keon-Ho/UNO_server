@@ -6,12 +6,20 @@ public:
 	struct stROOM
 	{
 		int number;
-		wchar_t name[64];
+		wchar_t name[64]; // 방 이름
 		int playerCount;
 		bool state;
 	};
+
+	struct stUser
+	{
+		int number;
+		wchar_t playerName[32]; // 유저 이름
+		int image;
+	};
 private:
 	stROOM m_room;
+	stUser* m_pPlayers;
 
 public:
 	CRoom();
@@ -20,10 +28,8 @@ public:
 
 	void CreateRoom(char* _buffer);
 	void OutRoom();
-	void ResetInfo();
-	void InPlayer() { m_room.playerCount += 1; }
+	void InPlayer(char* _buffer);
 
-	void SetInfo(char* _buffer);
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
 	wchar_t* GetName() { return m_room.name; }
