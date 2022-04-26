@@ -1,5 +1,5 @@
 #include "select.h"
-#include "roomBuffer.h"
+#include "roomManager.h"
 #include <stdio.h>
 
 #pragma comment( lib, "ws2_32.lib")
@@ -19,9 +19,7 @@ CSelect::CSelect(SOCKET _listenSocket)
 {
 	FD_ZERO_EX(&m_fdSocketInfors);
 	FD_SET_EX(m_listenSocket, nullptr, &m_fdSocketInfors);
-	m_roomManager = new CRoomManager();
-	CRoomBuffer::GetInstance()->SetRoomManager(m_roomManager);
-
+	CRoomManager::GetInstance()->Initialize();
 }
 
 void CSelect::Update()

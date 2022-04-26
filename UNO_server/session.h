@@ -2,7 +2,6 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include "user.h"
-#include "RoomManager.h"
 
 #define BUFFER_MAX 1000
 
@@ -12,30 +11,31 @@
 
 class CSession //目池记, 技记
 {
-public:
-	typedef std::vector<CRoom*> roomList_t;
-
 private:
 	SOCKET m_socket;
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
 
 	CUser* m_pUser; 
-	CRoomManager* m_pRoomManager; // rooms??
 
 public:
 	CSession();
 	~CSession();
 	CSession(SOCKET _socket, SOCKADDR_IN& _addr);
 
-	SOCKET GetSock() { return m_socket; }
 	int Recv();
 	void HandlePacket(int _type);
 
-	void RoomList();
 	void Login();
+	void CreateRoom();
 	void UserList();
+	void RoomList();
+	void InRoom();
+	void OutRoom();
+	void RoomState();
+	
 
+	SOCKET GetSock() { return m_socket; }
 	CUser* GetUser() { return m_pUser; }
 private:
 };

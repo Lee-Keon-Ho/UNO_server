@@ -13,7 +13,7 @@ CRoom::CRoom(int num)
 	m_room.playerCount = 0;
 	m_room.state = true;
 
-	m_pPlayers = new stUser[PLAYER_MAX];
+	m_pPlayers = new stUSER[PLAYER_MAX];
 }
 
 CRoom::~CRoom()
@@ -24,7 +24,7 @@ CRoom::~CRoom()
 void CRoom::CreateRoom(char* _buffer)
 {
 	// 2022-04-26 수정 : test
-	memcpy(m_room.name, _buffer + 6, 128);
+	memcpy(m_room.name, _buffer, ROOM_NAME_MAX * sizeof(wchar_t));
 	m_room.playerCount = 1;
 }
 
@@ -36,7 +36,7 @@ void CRoom::OutRoom()
 	}
 	if (m_room.playerCount <= 0)
 	{
-		memset(m_room.name, 0, 64);
+		memset(m_room.name, 0, ROOM_NAME_MAX * sizeof(wchar_t));
 		m_room.playerCount = 0;
 		m_room.state = true;
 	}
@@ -45,6 +45,7 @@ void CRoom::OutRoom()
 void CRoom::InPlayer(char* _buffer)
 {
 	m_room.playerCount += 1;
+	// 2022-04-26 수정 : 좋은 버릇은 아닌거 같다.
 	m_pPlayers[m_room.playerCount].image = *(unsigned int*)_buffer;
-	memcpy(m_pPlayers[m_room.playerCount].playerName, _buffer, 32);
+	memcpy(m_pPlayers[m_room.playerCount].playerName, _buffer, USER_NAME_MAX * sizeof(wchar_t));
 }

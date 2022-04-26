@@ -1,25 +1,28 @@
 #pragma once
 
+#define ROOM_NAME_MAX 64
+#define USER_NAME_MAX 32
+
 class CRoom
 {
 public:
 	struct stROOM
 	{
 		int number;
-		wchar_t name[64]; // 방 이름
+		wchar_t name[ROOM_NAME_MAX]; // 방 이름
 		int playerCount;
 		bool state;
 	};
 
-	struct stUser
+	struct stUSER
 	{
 		int number;
-		wchar_t playerName[32]; // 유저 이름
+		wchar_t playerName[USER_NAME_MAX]; // 유저 이름
 		int image;
 	};
 private:
 	stROOM m_room;
-	stUser* m_pPlayers;
+	stUSER* m_pPlayers;
 
 public:
 	CRoom();

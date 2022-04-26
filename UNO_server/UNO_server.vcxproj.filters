@@ -36,13 +36,10 @@
     <ClCompile Include="User.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="userManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="roomManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="roomBuffer.cpp">
+    <ClCompile Include="userManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,9 +62,6 @@
     <ClInclude Include="User.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="userManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="roomManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -77,7 +71,7 @@
     <ClInclude Include="PacketType.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="roomBuffer.h">
+    <ClInclude Include="userManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

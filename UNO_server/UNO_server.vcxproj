@@ -141,7 +141,6 @@
   <ItemGroup>
     <ClCompile Include="app.cpp" />
     <ClCompile Include="Room.cpp" />
-    <ClCompile Include="roomBuffer.cpp" />
     <ClCompile Include="roomManager.cpp" />
     <ClCompile Include="select.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -154,7 +153,6 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="PacketType.h" />
     <ClInclude Include="Room.h" />
-    <ClInclude Include="roomBuffer.h" />
     <ClInclude Include="roomManager.h" />
     <ClInclude Include="select.h" />
     <ClInclude Include="Server.h" />

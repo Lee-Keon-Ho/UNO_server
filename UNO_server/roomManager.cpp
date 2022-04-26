@@ -1,17 +1,48 @@
 #include "roomManager.h"
 
-CRoomManager::CRoomManager() : m_count(0)
+CRoomManager* CRoomManager::pInstance = nullptr;
+
+CRoomManager* CRoomManager::GetInstance()
+{
+	if (pInstance == nullptr) pInstance = new CRoomManager();
+	return pInstance;
+}
+
+void CRoomManager::DeleteInstance()
+{
+	if (pInstance) { delete pInstance; pInstance = nullptr; }
+}
+
+CRoomManager::CRoomManager()
+{
+	
+}
+
+CRoomManager::~CRoomManager()
+{
+	Cleanup();
+}
+
+bool CRoomManager::Initialize()
 {
 	m_roomList.reserve(63);
 	for (int i = 1; i < 64; i++)
 	{
 		m_roomList.push_back(new CRoom(i));
 	}
+
+	m_count = 0;
+	return true;
 }
 
-CRoomManager::~CRoomManager()
+void CRoomManager::Cleanup()
 {
-
+	std::vector<CRoom*>::iterator iter = m_roomList.begin();
+	std::vector<CRoom*>::iterator endIter = m_roomList.end();
+	for (; iter != endIter; iter++)
+	{
+		if (*iter) { delete (*iter); (*iter) = nullptr; }
+	}
 }
 
 CRoom* CRoomManager::CreateRoom(char* _buffer)
@@ -29,7 +60,7 @@ CRoom* CRoomManager::CreateRoom(char* _buffer)
 
 CRoom* CRoomManager::InRoom(char* _buffer)
 {
-	char* tempBuffer = _buffer + 4;
+	char* tempBuffer = _buffer;
 	int number = *(unsigned short*)tempBuffer;
 	tempBuffer += sizeof(unsigned short);
 	m_roomList[number]->InPlayer(tempBuffer);
