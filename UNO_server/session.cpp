@@ -94,8 +94,6 @@ void CSession::Login()
 
 	m_pUser->SetName(m_buffer + 4);
 
-	wprintf(L"%s", m_pUser->GetName());
-	printf(" 접속\n");
 	pUserManager->GetUserList()->push_back(m_pUser);
 
 	CUserManager::userList_t userList = *pUserManager->GetUserList();
@@ -134,6 +132,7 @@ void CSession::CreateRoom()
 	tempBuffer += sizeof(unsigned short);
 
 	m_pUser->SetRoom(CRoomManager::GetInstance()->CreateRoom(tempBuffer));
+	m_pUser->InPlayer();
 }
 
 void CSession::UserList()
@@ -159,9 +158,6 @@ void CSession::UserList()
 	}
 
 	int bufferSize = tempBuffer - sendBuffer;
-
-	wprintf(L"%s ", m_pUser->GetName());
-	printf("UserList 갱신\n");
 
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
@@ -211,24 +207,22 @@ void CSession::OutRoom()
 
 void CSession::RoomState()
 {
-	//CRoomBuffer::GetInstance()->RoomState();
-}
-/*
-void CSession::RoomState()
-{
 	char sendBuffer[1000];
 	char* tempBuffer = sendBuffer;
 
-	int len = sizeof(CRoom::stROOM);
-
-	*(unsigned short*)tempBuffer = 2 + 2 + len;
+	int count = m_pUser->GetPlayerCount();
+	int size = sizeof(CRoom::stUSER) * count;
+	*(unsigned short*)tempBuffer = 2 + 2 + sizeof(unsigned short) + size;
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_ROOMSTATE;
 	tempBuffer += sizeof(unsigned short);
 
-	memcpy(tempBuffer, m_pUser->GetRoom()->GetInfo(), len);
+	*(unsigned short*)tempBuffer = count;
+	tempBuffer += sizeof(unsigned short);
 
-	int bufferSize = tempBuffer - sendBuffer + len;
+	memcpy(tempBuffer, m_pUser->GetInRoomUserInfo(), size);
+
+	int bufferSize = tempBuffer - sendBuffer + size;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
-}*/
+}

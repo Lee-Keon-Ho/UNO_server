@@ -14,12 +14,13 @@ public:
 	CUser();
 	~CUser();
 
+	void InPlayer() { m_pRoom->InPlayer(m_name, m_image); }
+
 	void SetName(char* _name);
 	void SetRoom(CRoom* _room);
 	void SetImage(int _num) { m_image = _num; }
 	wchar_t* GetName() { return m_name; }
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }
-	CRoom* GetRoom() { return m_pRoom; }
-	void SetRoomInfo(char* _buffer, int _number);
-	void DestroyRoom();
+	int GetPlayerCount() { return m_pRoom->GetPlayerCount(); }
+	CRoom::stUSER* GetInRoomUserInfo() { return m_pRoom->GetInRoomUserInfo(); }
 };

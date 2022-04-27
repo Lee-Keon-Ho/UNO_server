@@ -22,8 +22,7 @@ public:
 	};
 private:
 	stROOM m_room;
-	stUSER* m_pPlayers;
-
+	stUSER m_pPlayers[5];
 public:
 	CRoom();
 	CRoom(int num);
@@ -31,11 +30,13 @@ public:
 
 	void CreateRoom(char* _buffer);
 	void OutRoom();
+	void InPlayer(wchar_t* _name, int _image);
 	void InPlayer(char* _buffer);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
+	stUSER* GetInRoomUserInfo() { return m_pPlayers; }
 private:
 };

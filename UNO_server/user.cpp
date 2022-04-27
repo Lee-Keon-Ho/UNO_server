@@ -21,13 +21,3 @@ void CUser::SetRoom(CRoom* _room)
 {
 	m_pRoom = _room;
 }
-
-void CUser::SetRoomInfo(char* _buffer, int _number)
-{
-	
-}
-
-void CUser::DestroyRoom()
-{
-
-}

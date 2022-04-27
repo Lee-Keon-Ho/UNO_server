@@ -61,7 +61,7 @@ CRoom* CRoomManager::CreateRoom(char* _buffer)
 CRoom* CRoomManager::InRoom(char* _buffer)
 {
 	char* tempBuffer = _buffer;
-	int number = *(unsigned short*)tempBuffer;
+	int number = *(unsigned short*)tempBuffer - 1;
 	tempBuffer += sizeof(unsigned short);
 	m_roomList[number]->InPlayer(tempBuffer);
 	return m_roomList[number];
