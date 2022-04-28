@@ -45,22 +45,22 @@ void CRoomManager::Cleanup()
 	}
 }
 
-CRoom* CRoomManager::CreateRoom(char* _buffer)
+CRoom* CRoomManager::CreateRoom(char* _name)
 {
 	for (int i = 0; i < 63; i++)
 	{
 		if (m_roomList[i]->GetPlayerCount() == 0)
 		{
-			m_roomList[i]->CreateRoom(_buffer);
+			m_roomList[i]->CreateRoom(_name);
 			m_count++;
 			return m_roomList[i];
 		}
 	}
 }
 
-CRoom* CRoomManager::InRoom(char* _buffer)
+CRoom* CRoomManager::InRoom(char* _playerInfo)
 {
-	char* tempBuffer = _buffer;
+	char* tempBuffer = _playerInfo;
 	int number = *(unsigned short*)tempBuffer - 1;
 	tempBuffer += sizeof(unsigned short);
 	m_roomList[number]->InPlayer(tempBuffer);

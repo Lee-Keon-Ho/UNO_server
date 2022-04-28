@@ -28,10 +28,10 @@ public:
 	CRoom(int num);
 	~CRoom();
 
-	void CreateRoom(char* _buffer);
+	void CreateRoom(char* _name);
 	void OutRoom();
 	void InPlayer(wchar_t* _name, int _image);
-	void InPlayer(char* _buffer);
+	void InPlayer(char* _playerInfo);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }

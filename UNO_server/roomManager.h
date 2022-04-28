@@ -21,8 +21,8 @@ public:
 	bool Initialize();
 	void Cleanup();
 
-	CRoom* CreateRoom(char* _buffer);
-	CRoom* InRoom(char* _buffer);
+	CRoom* CreateRoom(char* _name);
+	CRoom* InRoom(char* _playerInfo);
 	void OutRoom(int _num);
 
 	int GetCount() { return m_count; }
