@@ -33,7 +33,7 @@ public:
 	void InRoom();
 	void OutRoom();
 	void RoomState();
-	
+	void Chatting();
 
 	SOCKET GetSock() { return m_socket; }
 	CUser* GetUser() { return m_pUser; }

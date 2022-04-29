@@ -9,5 +9,6 @@ enum ePacketType
 	CS_PT_INROOM,
 	CS_PT_OUTROOM,
 	CS_PT_ROOMSTATE,
+	CS_PT_CHATTING,
 	CS_PT_MAX
 };

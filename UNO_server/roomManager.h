@@ -22,7 +22,7 @@ public:
 	void Cleanup();
 
 	CRoom* CreateRoom(char* _name);
-	CRoom* InRoom(char* _playerInfo);
+	CRoom* InRoom(char* _playerInfo, SOCKET _socket);
 	void OutRoom(int _num);
 
 	int GetCount() { return m_count; }

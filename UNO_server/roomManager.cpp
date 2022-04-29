@@ -58,12 +58,12 @@ CRoom* CRoomManager::CreateRoom(char* _name)
 	}
 }
 
-CRoom* CRoomManager::InRoom(char* _playerInfo)
+CRoom* CRoomManager::InRoom(char* _playerInfo, SOCKET _socket)
 {
 	char* tempBuffer = _playerInfo;
 	int number = *(unsigned short*)tempBuffer - 1;
 	tempBuffer += sizeof(unsigned short);
-	m_roomList[number]->InPlayer(tempBuffer);
+	m_roomList[number]->InPlayer(tempBuffer, _socket);
 	return m_roomList[number];
 }
 

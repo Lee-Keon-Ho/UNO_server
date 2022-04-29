@@ -14,7 +14,8 @@ public:
 	CUser();
 	~CUser();
 
-	void InPlayer() { m_pRoom->InPlayer(m_name, m_image); }
+	void InPlayer(SOCKET _socket) { m_pRoom->InPlayer(m_name, m_image, _socket); }
+	void PushBack(char* _chatting) { m_pRoom->PushBack(_chatting); }
 
 	void SetName(char* _name);
 	void SetRoom(CRoom* _room);
@@ -23,4 +24,5 @@ public:
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }
 	int GetPlayerCount() { return m_pRoom->GetPlayerCount(); }
 	CRoom::stUSER* GetInRoomUserInfo() { return m_pRoom->GetInRoomUserInfo(); }
+	CRoom::chatting_t* GetChatDeque() { return m_pRoom->GetChatDeque(); }
 };

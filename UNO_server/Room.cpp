@@ -43,16 +43,17 @@ void CRoom::OutRoom()
 }
 
 // clreateRoom -> inplayer
-void CRoom::InPlayer(wchar_t* _name, int _image)
+void CRoom::InPlayer(wchar_t* _name, int _image, SOCKET _socket)
 {
 	// 2022-04-27 수정
 	int num = m_room.playerCount - 1;
 	m_pPlayers[num].number = num;
 	m_pPlayers[num].image = _image;
 	memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
+	m_pPlayers[num].socket = _socket;
 }
 
-void CRoom::InPlayer(char* _playerInfo)
+void CRoom::InPlayer(char* _playerInfo, SOCKET _socket)
 {
 	int num = m_room.playerCount;
 	m_pPlayers[num].number = num;
@@ -60,4 +61,13 @@ void CRoom::InPlayer(char* _playerInfo)
 	// 2022-04-26 수정 : 좋은 버릇은 아닌거 같다.
 	m_pPlayers[num].image = *(unsigned short*)_playerInfo;
 	memcpy(m_pPlayers[num].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
+	m_pPlayers[num].socket = _socket;
+}
+
+void CRoom::PushBack(char* _chatting)
+{
+	// 2022-04-29 수정 : test
+	char* pChat = new char[64];
+	memcpy(pChat, _chatting, 64);
+	m_chatting.push_back(pChat);
 }

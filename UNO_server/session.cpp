@@ -84,6 +84,9 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_ROOMSTATE:
 		RoomState();	
 		break;
+	case CS_PT_CHATTING:
+		Chatting();
+		break;
 	}
 }
 
@@ -132,7 +135,7 @@ void CSession::CreateRoom()
 	tempBuffer += sizeof(unsigned short);
 
 	m_pUser->SetRoom(CRoomManager::GetInstance()->CreateRoom(tempBuffer));
-	m_pUser->InPlayer();
+	m_pUser->InPlayer(m_socket);
 }
 
 void CSession::UserList()
@@ -196,7 +199,7 @@ void CSession::InRoom()
 
 	tempBuffer += (sizeof(unsigned short) * 2); // 4;
 
-	m_pUser->SetRoom(CRoomManager::GetInstance()->InRoom(tempBuffer));
+	m_pUser->SetRoom(CRoomManager::GetInstance()->InRoom(tempBuffer, m_socket));
 }
 
 void CSession::OutRoom()
@@ -225,4 +228,47 @@ void CSession::RoomState()
 	int bufferSize = tempBuffer - sendBuffer + size;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
+}
+
+void CSession::Chatting()
+{
+	// 2022-04-29 ¼öÁ¤
+	char buffer[200];
+	char* tempBuffer = buffer;
+
+	unsigned short packetSize = *(unsigned short*)m_buffer;
+
+	int size = wcslen(m_pUser->GetName()) * sizeof(wchar_t);
+	memcpy(tempBuffer, m_pUser->GetName(), size);
+	tempBuffer += size;
+	memcpy(tempBuffer, L" : ", wcslen(L" : ") * sizeof(wchar_t));
+	tempBuffer += wcslen(L" : ") * sizeof(wchar_t);
+	memcpy(tempBuffer, m_buffer + 4, packetSize - 4);
+
+	m_pUser->PushBack(buffer);
+
+	char sendBuffer[1000];
+	char* sendTempBuffer = sendBuffer;
+
+	CRoom::chatting_t* deque = m_pUser->GetChatDeque();
+
+	*(unsigned short*)sendTempBuffer = 2 + 2 + deque->size() * 200; // test
+	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = CS_PT_CHATTING;
+	sendTempBuffer += sizeof(unsigned short);
+
+	std::deque<char*>::iterator iter = deque->begin();
+	std::deque<char*>::iterator endIter = deque->end();
+
+	for (; iter != endIter; iter++)
+	{
+		memcpy(sendTempBuffer, (*iter), 100);
+		sendTempBuffer += 100;
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		send(m_pUser->GetInRoomUserInfo()[i].socket, sendBuffer, 1000, 0);
+	}
+	
 }
