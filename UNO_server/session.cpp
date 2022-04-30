@@ -4,6 +4,8 @@
 #include "PacketType.h"
 #include <stdio.h>
 
+#define SENDBUFFER 1000
+
 CSession::CSession()
 {
 	m_pUser = new CUser();
@@ -61,7 +63,7 @@ int CSession::Recv()
 
 void CSession::HandlePacket(int _type)
 {
-	switch(_type)
+	switch (_type)
 	{
 	case CS_PT_LOGIN:
 		Login();
@@ -82,14 +84,13 @@ void CSession::HandlePacket(int _type)
 		OutRoom();
 		break;
 	case CS_PT_ROOMSTATE:
-		RoomState();	
+		RoomState();
 		break;
 	case CS_PT_CHATTING:
 		Chatting();
 		break;
 	}
 }
-
 
 void CSession::Login()
 {
@@ -101,7 +102,7 @@ void CSession::Login()
 
 	CUserManager::userList_t userList = *pUserManager->GetUserList();
 
-	char sendBuffer[1000];
+	char sendBuffer[SENDBUFFER];
 	char* tempBuffer = sendBuffer;
 
 	int listSize = userList.size();
@@ -170,7 +171,7 @@ void CSession::RoomList()
 {
 	CRoomManager* pRM = CRoomManager::GetInstance();
 	CRoomManager::roomList_t* roomList = pRM->GetRoomList();
-	char sendBuffer[1000];
+	char sendBuffer[SENDBUFFER];
 	char* tempBuffer = sendBuffer;
 
 	int listSize = pRM->GetCount();
@@ -206,11 +207,13 @@ void CSession::OutRoom()
 {
 	CRoomManager::GetInstance()->OutRoom(m_pUser->GetRoomNumber());
 	m_pUser->SetRoom(nullptr);
+
+	//m_pRoom->OutUser(this->m_pUser);
 }
 
 void CSession::RoomState()
 {
-	char sendBuffer[1000];
+	char sendBuffer[SENDBUFFER];
 	char* tempBuffer = sendBuffer;
 
 	int count = m_pUser->GetPlayerCount();
@@ -247,12 +250,12 @@ void CSession::Chatting()
 
 	m_pUser->PushBack(buffer);
 
-	char sendBuffer[1000];
+	char sendBuffer[5000];
 	char* sendTempBuffer = sendBuffer;
 
 	CRoom::chatting_t* deque = m_pUser->GetChatDeque();
 
-	*(unsigned short*)sendTempBuffer = 2 + 2 + deque->size() * 200; // test
+	*(unsigned short*)sendTempBuffer = 2 + 2 + deque->size() * 200; // 2022-04-29 test
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = CS_PT_CHATTING;
 	sendTempBuffer += sizeof(unsigned short);
@@ -265,10 +268,14 @@ void CSession::Chatting()
 		memcpy(sendTempBuffer, (*iter), 100);
 		sendTempBuffer += 100;
 	}
-
-	for (int i = 0; i < 5; i++)
-	{
-		send(m_pUser->GetInRoomUserInfo()[i].socket, sendBuffer, 1000, 0);
-	}
 	
+	for (int i = 0; i < m_pUser->GetPlayerCount(); i++)
+	{
+		int sendSize = send(m_pUser->GetInRoomUserInfo()[i].socket, sendBuffer, 1000, 0);
+		// 2022-04-29 ¼öÁ¤ : test
+		if (sendSize < 0)
+		{
+			break;
+		}
+	}
 }

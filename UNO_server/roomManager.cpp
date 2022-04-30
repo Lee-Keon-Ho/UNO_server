@@ -45,6 +45,8 @@ void CRoomManager::Cleanup()
 	}
 }
 
+
+// ¹ö±× : 
 CRoom* CRoomManager::CreateRoom(char* _name)
 {
 	for (int i = 0; i < 63; i++)

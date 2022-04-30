@@ -5,13 +5,19 @@
 // 2022-04-25 수정
 class CRoomManager
 {
-public:
-	typedef std::vector<CRoom*> roomList_t; // 호텔이다
-
 private:
 	static CRoomManager* pInstance;
 	CRoomManager();
 	~CRoomManager();
+
+public:
+	static CRoomManager* GetInstance();
+	static void DeleteInstance();
+
+
+
+public:
+	typedef std::vector<CRoom*> roomList_t; // 호텔이다
 
 private:
 	roomList_t m_roomList;
@@ -27,8 +33,4 @@ public:
 
 	int GetCount() { return m_count; }
 	roomList_t* GetRoomList() { return &m_roomList; }
-
-public:
-	static CRoomManager* GetInstance();
-	static void DeleteInstance();
 };
