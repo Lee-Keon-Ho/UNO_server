@@ -135,8 +135,8 @@ void CSession::CreateRoom()
 	m_pUser->SetImage(*tempBuffer);
 	tempBuffer += sizeof(unsigned short);
 
-	m_pUser->SetRoom(CRoomManager::GetInstance()->CreateRoom(tempBuffer));
-	m_pUser->InPlayer(m_socket);
+	m_pUser->CreateRoom(tempBuffer);
+	m_pUser->PlayerIn(m_socket);
 }
 
 void CSession::UserList()
@@ -200,15 +200,12 @@ void CSession::InRoom()
 
 	tempBuffer += (sizeof(unsigned short) * 2); // 4;
 
-	m_pUser->SetRoom(CRoomManager::GetInstance()->InRoom(tempBuffer, m_socket));
+	m_pUser->RoomIn(tempBuffer, m_socket);
 }
 
 void CSession::OutRoom()
 {
-	CRoomManager::GetInstance()->OutRoom(m_pUser->GetRoomNumber());
-	m_pUser->SetRoom(nullptr);
-
-	//m_pRoom->OutUser(this->m_pUser);
+	m_pUser->RoomOut();
 }
 
 void CSession::RoomState()
@@ -236,7 +233,8 @@ void CSession::RoomState()
 void CSession::Chatting()
 {
 	// 2022-04-29 수정
-	char buffer[200];
+	char buffer[64];
+	memset(buffer, 0, 64);
 	char* tempBuffer = buffer;
 
 	unsigned short packetSize = *(unsigned short*)m_buffer;
@@ -255,9 +253,21 @@ void CSession::Chatting()
 
 	CRoom::chatting_t* deque = m_pUser->GetChatDeque();
 
-	*(unsigned short*)sendTempBuffer = 2 + 2 + deque->size() * 200; // 2022-04-29 test
+	if (deque->size() > 13)
+	{
+		// 2022-05-02 수정 : 보관하는게 좋은가 지우는게 좋은가...
+		std::deque<char*>::iterator iter = deque->begin();
+		delete[] * iter;
+		deque->pop_front();
+	}
+
+	int sendLen = 2 + 2 + deque->size() * 64;
+
+	*(unsigned short*)sendTempBuffer = sendLen; // 2022-04-29 test
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = CS_PT_CHATTING;
+	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = deque->size();
 	sendTempBuffer += sizeof(unsigned short);
 
 	std::deque<char*>::iterator iter = deque->begin();
@@ -265,13 +275,13 @@ void CSession::Chatting()
 
 	for (; iter != endIter; iter++)
 	{
-		memcpy(sendTempBuffer, (*iter), 100);
-		sendTempBuffer += 100;
+		memcpy(sendTempBuffer, (*iter), 64);
+		sendTempBuffer += 64;
 	}
 	
 	for (int i = 0; i < m_pUser->GetPlayerCount(); i++)
 	{
-		int sendSize = send(m_pUser->GetInRoomUserInfo()[i].socket, sendBuffer, 1000, 0);
+		int sendSize = send(m_pUser->GetInRoomUserInfo()[i].socket, sendBuffer, sendLen, 0);
 		// 2022-04-29 수정 : test
 		if (sendSize < 0)
 		{

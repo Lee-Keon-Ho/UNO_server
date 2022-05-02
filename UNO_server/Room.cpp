@@ -28,22 +28,26 @@ void CRoom::CreateRoom(char* _name)
 	m_room.playerCount = 1;
 }
 
-void CRoom::OutRoom()
+bool CRoom::RoomOut()
 {
+	bool bRoom;
 	if (m_room.playerCount > 0)
 	{
 		m_room.playerCount -= 1;
+		bRoom = true;
 	}
 	if (m_room.playerCount <= 0)
 	{
 		memset(m_room.name, 0, ROOM_NAME_MAX * sizeof(wchar_t));
 		m_room.playerCount = 0;
 		m_room.state = true;
+		bRoom = false;
 	}
+	return bRoom;
 }
 
-// clreateRoom -> inplayer
-void CRoom::InPlayer(wchar_t* _name, int _image, SOCKET _socket)
+// clreateRoom -> playerin
+void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 {
 	// 2022-04-27 수정
 	int num = m_room.playerCount - 1;
@@ -53,12 +57,11 @@ void CRoom::InPlayer(wchar_t* _name, int _image, SOCKET _socket)
 	m_pPlayers[num].socket = _socket;
 }
 
-void CRoom::InPlayer(char* _playerInfo, SOCKET _socket)
+void CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 {
 	int num = m_room.playerCount;
 	m_pPlayers[num].number = num;
 	m_room.playerCount += 1;
-	// 2022-04-26 수정 : 좋은 버릇은 아닌거 같다.
 	m_pPlayers[num].image = *(unsigned short*)_playerInfo;
 	memcpy(m_pPlayers[num].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
 	m_pPlayers[num].socket = _socket;
@@ -70,4 +73,17 @@ void CRoom::PushBack(char* _chatting)
 	char* pChat = new char[64];
 	memcpy(pChat, _chatting, 64);
 	m_chatting.push_back(pChat);
+}
+
+void CRoom::ReSetChat()
+{
+	chatting_t::iterator iter = m_chatting.begin();
+	chatting_t::iterator endIter = m_chatting.end();
+
+	for (; iter != endIter; iter++)
+	{
+		delete[] *iter;
+	}
+
+	m_chatting.clear();
 }

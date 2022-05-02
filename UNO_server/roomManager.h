@@ -14,8 +14,6 @@ public:
 	static CRoomManager* GetInstance();
 	static void DeleteInstance();
 
-
-
 public:
 	typedef std::vector<CRoom*> roomList_t; // 호텔이다
 
@@ -28,8 +26,8 @@ public:
 	void Cleanup();
 
 	CRoom* CreateRoom(char* _name);
-	CRoom* InRoom(char* _playerInfo, SOCKET _socket);
-	void OutRoom(int _num);
+	CRoom* RoomIn(char* _playerInfo, SOCKET _socket);
+	void RoomOut();
 
 	int GetCount() { return m_count; }
 	roomList_t* GetRoomList() { return &m_roomList; }

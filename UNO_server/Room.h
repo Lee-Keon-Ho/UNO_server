@@ -38,10 +38,11 @@ public:
 	~CRoom();
 
 	void CreateRoom(char* _name);
-	void OutRoom();
-	void InPlayer(wchar_t* _name, int _image, SOCKET _socket);
-	void InPlayer(char* _playerInfo, SOCKET _socket);
+	bool RoomOut();
+	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
+	void PlayerIn(char* _playerInfo, SOCKET _socket);
 	void PushBack(char* _chatting);
+	void ReSetChat();
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }

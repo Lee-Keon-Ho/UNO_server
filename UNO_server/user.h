@@ -14,11 +14,12 @@ public:
 	CUser();
 	~CUser();
 
-	void InPlayer(SOCKET _socket) { m_pRoom->InPlayer(m_name, m_image, _socket); }
-	void PushBack(char* _chatting) { m_pRoom->PushBack(_chatting); }
-
+	void PlayerIn(SOCKET _socket);
+	void PushBack(char* _chatting);
 	void SetName(char* _name);
-	void SetRoom(CRoom* _room);
+	void CreateRoom(char* _name);
+	void RoomIn(char* _playerInfo, SOCKET _socket); // 2022-05-02 ¼öÁ¤
+	void RoomOut();
 	void SetImage(int _num) { m_image = _num; }
 	wchar_t* GetName() { return m_name; }
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }
