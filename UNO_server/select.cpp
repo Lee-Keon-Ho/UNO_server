@@ -1,5 +1,6 @@
 #include "select.h"
 #include "roomManager.h"
+#include "userManager.h"
 #include <stdio.h>
 
 #pragma comment( lib, "ws2_32.lib")
@@ -37,6 +38,8 @@ void CSelect::Update()
 				if (sockTemp == m_listenSocket)
 				{
 					Accept();
+					// 2022-05-03 수정 : 전체적으로 전부 수정해야한다...
+					//m_lobby.AddUser(m_fdSocketInfors.session_array[i]->GetUser());
 				}
 				else
 				{

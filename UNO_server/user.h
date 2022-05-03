@@ -17,8 +17,8 @@ public:
 	void PlayerIn(SOCKET _socket);
 	void PushBack(char* _chatting);
 	void SetName(char* _name);
-	void CreateRoom(char* _name);
-	void RoomIn(char* _playerInfo, SOCKET _socket); // 2022-05-02 수정
+	bool CreateRoom(char* _name);
+	bool RoomIn(char* _playerInfo, SOCKET _socket); // 2022-05-02 수정
 	void RoomOut();
 	void SetImage(int _num) { m_image = _num; }
 	wchar_t* GetName() { return m_name; }

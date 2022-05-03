@@ -45,12 +45,10 @@ int CSession::Recv()
 		{
 			memcpy(m_buffer, m_buffer + packetSize, recvedSize);
 
-			// 2022-04-25 수정 : unsigned short 값이면 packetSize
 			if (recvedSize > 1) 
 			{
 				packetSize = *(unsigned short*)m_buffer;
 			}
-			// 2022-04-25 수정 : recvedSize가 3초과면 type까지 알 수 있다.
 			if (recvedSize > 3)
 			{
 				type = *(unsigned short*)(m_buffer + 2);
@@ -78,10 +76,10 @@ void CSession::HandlePacket(int _type)
 		RoomList();
 		break;
 	case CS_PT_INROOM:
-		InRoom();
+		RoomIn();
 		break;
 	case CS_PT_OUTROOM:
-		OutRoom();
+		RoomOut();
 		break;
 	case CS_PT_ROOMSTATE:
 		RoomState();
@@ -129,14 +127,34 @@ void CSession::Login()
 void CSession::CreateRoom()
 {
 	char* tempBuffer = m_buffer;
-	
+	char sendBuffer[SENDBUFFER];
+	char* sendTempBuffer = sendBuffer;
+	bool bCreate = true;
 	tempBuffer += (sizeof(unsigned short) * 2); // 4;
 	
 	m_pUser->SetImage(*tempBuffer);
 	tempBuffer += sizeof(unsigned short);
 
-	m_pUser->CreateRoom(tempBuffer);
-	m_pUser->PlayerIn(m_socket);
+	if (m_pUser->CreateRoom(tempBuffer))
+	{
+		m_pUser->PlayerIn(m_socket);
+		bCreate = true;
+	}
+	else 
+	{ 
+		bCreate = false;
+	}
+
+	*(unsigned short*)sendTempBuffer = 2 + 2 + 2;
+	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = CS_PT_CREATEROOM;
+	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = bCreate;
+	sendTempBuffer += sizeof(unsigned short);
+
+	int bufferSize = sendTempBuffer - sendBuffer;
+
+	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
 void CSession::UserList()
@@ -194,16 +212,31 @@ void CSession::RoomList()
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
-void CSession::InRoom()
+void CSession::RoomIn()
 {
 	char* tempBuffer = m_buffer;
+	char sendBuffer[SENDBUFFER];
+	char* sendTempBuffer = sendBuffer;
+	bool bRoomIn = true;
 
 	tempBuffer += (sizeof(unsigned short) * 2); // 4;
 
-	m_pUser->RoomIn(tempBuffer, m_socket);
+	if (m_pUser->RoomIn(tempBuffer, m_socket)) bRoomIn = true;
+	else bRoomIn = false;
+	
+	*(unsigned short*)sendTempBuffer = 2 + 2 + 2;
+	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = CS_PT_INROOM;
+	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = bRoomIn;
+	sendTempBuffer += sizeof(unsigned short);
+
+	int bufferSize = sendTempBuffer - sendBuffer;
+
+	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
-void CSession::OutRoom()
+void CSession::RoomOut()
 {
 	m_pUser->RoomOut();
 }

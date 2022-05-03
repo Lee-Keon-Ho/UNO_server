@@ -40,7 +40,7 @@ public:
 	void CreateRoom(char* _name);
 	bool RoomOut();
 	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
-	void PlayerIn(char* _playerInfo, SOCKET _socket);
+	bool PlayerIn(char* _playerInfo, SOCKET _socket);
 	void PushBack(char* _chatting);
 	void ReSetChat();
 

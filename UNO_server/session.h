@@ -30,8 +30,8 @@ public:
 	void CreateRoom();
 	void UserList();
 	void RoomList();
-	void InRoom();
-	void OutRoom();
+	void RoomIn();
+	void RoomOut();
 	void RoomState();
 	void Chatting();
 

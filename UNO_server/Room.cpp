@@ -46,10 +46,9 @@ bool CRoom::RoomOut()
 	return bRoom;
 }
 
-// clreateRoom -> playerin
+// createRoom -> playerin
 void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 {
-	// 2022-04-27 ¼öÁ¤
 	int num = m_room.playerCount - 1;
 	m_pPlayers[num].number = num;
 	m_pPlayers[num].image = _image;
@@ -57,14 +56,19 @@ void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 	m_pPlayers[num].socket = _socket;
 }
 
-void CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
+bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 {
 	int num = m_room.playerCount;
+	if (num > 4)
+	{
+		return false;
+	}
 	m_pPlayers[num].number = num;
 	m_room.playerCount += 1;
 	m_pPlayers[num].image = *(unsigned short*)_playerInfo;
 	memcpy(m_pPlayers[num].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
 	m_pPlayers[num].socket = _socket;
+	return true;
 }
 
 void CRoom::PushBack(char* _chatting)

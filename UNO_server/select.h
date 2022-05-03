@@ -1,14 +1,14 @@
 #pragma once
 #include "fd_set_ex.h"
-#include "userManager.h"
-#include "roomManager.h"
+#include "Lobby.h"
 
 class CSelect
 {
 private:
     SOCKET m_listenSocket;
     fd_set_ex m_fdSocketInfors;
-    CRoomManager* m_roomManager;
+
+    CLobby m_lobby;
 
     fd_set  fdReads;
     SOCKET  sockTemp;

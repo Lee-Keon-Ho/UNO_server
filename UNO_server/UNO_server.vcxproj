@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="roomManager.cpp" />
     <ClCompile Include="select.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
+    <ClInclude Include="Lobby.h" />
     <ClInclude Include="PacketType.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="roomManager.h" />

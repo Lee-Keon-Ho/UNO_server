@@ -28,15 +28,25 @@ void CUser::SetName(char* _name)
 	memcpy(m_name, _name, sizeof(wchar_t) * NAME_MAX);
 }
 
-void CUser::CreateRoom(char* _name)
+bool CUser::CreateRoom(char* _name)
 {
 	m_pRoom = CRoomManager::GetInstance()->CreateRoom(_name);
+	if (m_pRoom == nullptr)
+	{
+		return false;
+	}
+	return true;
 }
 
 //2022-05-02 ¼öÁ¤
-void CUser::RoomIn(char* _playerInfo, SOCKET _socket)
+bool CUser::RoomIn(char* _playerInfo, SOCKET _socket)
 {
 	m_pRoom = CRoomManager::GetInstance()->RoomIn(_playerInfo, _socket);
+	if (m_pRoom == nullptr)
+	{
+		return false;
+	}
+	return true;
 }
 
 void CUser::RoomOut()

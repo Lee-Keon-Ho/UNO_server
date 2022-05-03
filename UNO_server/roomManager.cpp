@@ -46,7 +46,6 @@ void CRoomManager::Cleanup()
 }
 
 
-// ¹ö±× : 
 CRoom* CRoomManager::CreateRoom(char* _name)
 {
 	for (int i = 0; i < 63; i++)
@@ -58,6 +57,7 @@ CRoom* CRoomManager::CreateRoom(char* _name)
 			return m_roomList[i];
 		}
 	}
+	return nullptr;
 }
 
 CRoom* CRoomManager::RoomIn(char* _playerInfo, SOCKET _socket)
@@ -65,8 +65,11 @@ CRoom* CRoomManager::RoomIn(char* _playerInfo, SOCKET _socket)
 	char* tempBuffer = _playerInfo;
 	int number = *(unsigned short*)tempBuffer - 1;
 	tempBuffer += sizeof(unsigned short);
-	m_roomList[number]->PlayerIn(tempBuffer, _socket);
-	return m_roomList[number];
+	if (m_roomList[number]->PlayerIn(tempBuffer, _socket))
+	{
+		return m_roomList[number];
+	}
+	return nullptr;
 }
 
 void CRoomManager::RoomOut()
