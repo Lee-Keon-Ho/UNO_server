@@ -31,7 +31,7 @@ public:
 	void UserList();
 	void RoomList();
 	void RoomIn();
-	void RoomOut();
+	void RoomOut(SOCKET _socket);
 	void RoomState();
 	void Chatting();
 

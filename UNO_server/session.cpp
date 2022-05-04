@@ -79,7 +79,7 @@ void CSession::HandlePacket(int _type)
 		RoomIn();
 		break;
 	case CS_PT_OUTROOM:
-		RoomOut();
+		RoomOut(m_socket);
 		break;
 	case CS_PT_ROOMSTATE:
 		RoomState();
@@ -236,9 +236,9 @@ void CSession::RoomIn()
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
-void CSession::RoomOut()
+void CSession::RoomOut(SOCKET _socket)
 {
-	m_pUser->RoomOut();
+	m_pUser->RoomOut(_socket);
 }
 
 void CSession::RoomState()

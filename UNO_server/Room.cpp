@@ -28,20 +28,38 @@ void CRoom::CreateRoom(char* _name)
 	m_room.playerCount = 1;
 }
 
-bool CRoom::RoomOut()
+bool CRoom::RoomOut(SOCKET _socket)
 {
-	bool bRoom;
+	bool bRoom = true;
 	if (m_room.playerCount > 0)
 	{
 		m_room.playerCount -= 1;
-		bRoom = true;
-	}
-	if (m_room.playerCount <= 0)
-	{
-		memset(m_room.name, 0, ROOM_NAME_MAX * sizeof(wchar_t));
-		m_room.playerCount = 0;
-		m_room.state = true;
-		bRoom = false;
+
+		if (m_room.playerCount <= 0)
+		{
+			memset(m_room.name, 0, ROOM_NAME_MAX * sizeof(wchar_t));
+			m_room.playerCount = 0;
+			m_room.state = true;
+			bRoom = false;
+		}
+		else
+		{
+			for (int i = 0; i < PLAYER_MAX; i++)
+			{
+				if (m_pPlayers[i].socket == _socket)
+				{
+					for (int j = i; j < PLAYER_MAX; j++)
+					{
+						if (j + 1 < 5)
+						{
+							m_pPlayers[j] = m_pPlayers[j + 1];
+						}	
+					}
+					break;
+				}
+			}
+			bRoom = true;
+		}
 	}
 	return bRoom;
 }

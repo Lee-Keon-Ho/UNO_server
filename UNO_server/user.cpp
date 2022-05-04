@@ -49,8 +49,8 @@ bool CUser::RoomIn(char* _playerInfo, SOCKET _socket)
 	return true;
 }
 
-void CUser::RoomOut()
+void CUser::RoomOut(SOCKET _socket)
 {
-	if (!m_pRoom->RoomOut()) CRoomManager::GetInstance()->RoomOut();
+	if (!m_pRoom->RoomOut(_socket)) CRoomManager::GetInstance()->RoomOut();
 	m_pRoom->ReSetChat();
 }
