@@ -52,13 +52,22 @@ bool CRoom::RoomOut(SOCKET _socket)
 					{
 						if (j + 1 < 5)
 						{
+							m_pPlayers[j + 1].number -= 1;
 							m_pPlayers[j] = m_pPlayers[j + 1];
-						}	
+						}
+						else
+						{
+							memset(&m_pPlayers[j + 1], 0, sizeof(stUSER));
+						}
 					}
 					break;
 				}
 			}
 			bRoom = true;
+		}
+		for (int i = 0; i < m_room.playerCount; i++)
+		{
+			wprintf_s(L"%s \n", m_pPlayers[i].playerName);
 		}
 	}
 	return bRoom;

@@ -24,6 +24,7 @@ public:
 		wchar_t playerName[USER_NAME_MAX]; // 유저 이름
 		int image;
 		SOCKET socket;
+		bool boss;
 	};
 
 	typedef std::deque<char*> chatting_t;
