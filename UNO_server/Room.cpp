@@ -48,12 +48,14 @@ bool CRoom::RoomOut(SOCKET _socket)
 			{
 				if (m_pPlayers[i].socket == _socket)
 				{
+					//for (int j = i; j < PLAYER_MAX-1; j++)
 					for (int j = i; j < PLAYER_MAX; j++)
 					{
 						if (j + 1 < 5)
 						{
 							m_pPlayers[j + 1].number -= 1;
 							m_pPlayers[j] = m_pPlayers[j + 1];
+							//m_pPlayers[j].number = j;
 						}
 						else
 						{
@@ -72,7 +74,16 @@ bool CRoom::RoomOut(SOCKET _socket)
 	}
 	return bRoom;
 }
-
+/*
+void CRoom::PlayerIn(int _num, wchar_t* _name, int _image, SOCKET _socket)
+{
+	//int num = m_room.playerCount - 1;
+	m_pPlayers[_num].number = _num;
+	m_pPlayers[_num].image = _image;
+	memcpy(m_pPlayers[_num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
+	m_pPlayers[_num].socket = _socket;
+}
+*/
 // createRoom -> playerin
 void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 {
@@ -86,12 +97,10 @@ void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 {
 	int num = m_room.playerCount;
-	if (num > 4)
-	{
-		return false;
-	}
+	if (num > 4)	return false;
+
 	m_pPlayers[num].number = num;
-	m_room.playerCount += 1;
+	m_room.playerCount++ ;
 	m_pPlayers[num].image = *(unsigned short*)_playerInfo;
 	memcpy(m_pPlayers[num].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
 	m_pPlayers[num].socket = _socket;
