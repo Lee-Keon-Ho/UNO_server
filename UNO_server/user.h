@@ -15,7 +15,6 @@ public:
 	~CUser();
 
 	void PlayerIn(SOCKET _socket);
-	void PushBack(char* _chatting);
 	void SetName(char* _name);
 	bool CreateRoom(char* _name);
 	bool RoomIn(char* _playerInfo, SOCKET _socket); // 2022-05-02 ¼öÁ¤
@@ -25,5 +24,4 @@ public:
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }
 	int GetPlayerCount() { return m_pRoom->GetPlayerCount(); }
 	CRoom::stUSER* GetInRoomUserInfo() { return m_pRoom->GetInRoomUserInfo(); }
-	CRoom::chatting_t* GetChatDeque() { return m_pRoom->GetChatDeque(); }
 };

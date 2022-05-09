@@ -18,11 +18,6 @@ void CUser::PlayerIn(SOCKET _socket)
 	m_pRoom->PlayerIn(m_name, m_image, _socket);
 }
 
-void CUser::PushBack(char* _chatting)
-{
-	m_pRoom->PushBack(_chatting);
-}
-
 void CUser::SetName(char* _name)
 {
 	memcpy(m_name, _name, sizeof(wchar_t) * NAME_MAX);
@@ -52,5 +47,4 @@ bool CUser::RoomIn(char* _playerInfo, SOCKET _socket)
 void CUser::RoomOut(SOCKET _socket)
 {
 	if (!m_pRoom->RoomOut(_socket)) CRoomManager::GetInstance()->RoomOut();
-	m_pRoom->ReSetChat();
 }

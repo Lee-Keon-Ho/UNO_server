@@ -33,7 +33,7 @@ bool CRoom::RoomOut(SOCKET _socket)
 	bool bRoom = true;
 	if (m_room.playerCount > 0)
 	{
-		m_room.playerCount -= 1;
+		m_room.playerCount--;
 
 		if (m_room.playerCount <= 0)
 		{
@@ -48,47 +48,21 @@ bool CRoom::RoomOut(SOCKET _socket)
 			{
 				if (m_pPlayers[i].socket == _socket)
 				{
-					//for (int j = i; j < PLAYER_MAX-1; j++)
-					for (int j = i; j < PLAYER_MAX; j++)
-					{
-						if (j + 1 < 5)
-						{
-							m_pPlayers[j + 1].number -= 1;
-							m_pPlayers[j] = m_pPlayers[j + 1];
-							//m_pPlayers[j].number = j;
-						}
-						else
-						{
-							memset(&m_pPlayers[j + 1], 0, sizeof(stUSER));
-						}
-					}
+					memset(&m_pPlayers[i], 0, sizeof(CRoom::stUSER));
 					break;
 				}
 			}
 			bRoom = true;
 		}
-		for (int i = 0; i < m_room.playerCount; i++)
-		{
-			wprintf_s(L"%s \n", m_pPlayers[i].playerName);
-		}
 	}
 	return bRoom;
 }
-/*
-void CRoom::PlayerIn(int _num, wchar_t* _name, int _image, SOCKET _socket)
-{
-	//int num = m_room.playerCount - 1;
-	m_pPlayers[_num].number = _num;
-	m_pPlayers[_num].image = _image;
-	memcpy(m_pPlayers[_num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
-	m_pPlayers[_num].socket = _socket;
-}
-*/
+
 // createRoom -> playerin
 void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 {
 	int num = m_room.playerCount - 1;
-	m_pPlayers[num].number = num;
+	m_pPlayers[num].number = m_room.playerCount;
 	m_pPlayers[num].image = _image;
 	memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
 	m_pPlayers[num].socket = _socket;
@@ -96,34 +70,18 @@ void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 
 bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 {
-	int num = m_room.playerCount;
-	if (num > 4)	return false;
-
-	m_pPlayers[num].number = num;
-	m_room.playerCount++ ;
-	m_pPlayers[num].image = *(unsigned short*)_playerInfo;
-	memcpy(m_pPlayers[num].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
-	m_pPlayers[num].socket = _socket;
-	return true;
-}
-
-void CRoom::PushBack(char* _chatting)
-{
-	// 2022-04-29 ¼öÁ¤ : test
-	char* pChat = new char[64];
-	memcpy(pChat, _chatting, 64);
-	m_chatting.push_back(pChat);
-}
-
-void CRoom::ReSetChat()
-{
-	chatting_t::iterator iter = m_chatting.begin();
-	chatting_t::iterator endIter = m_chatting.end();
-
-	for (; iter != endIter; iter++)
+	if (m_room.playerCount >= PLAYER_MAX) return false;
+	m_room.playerCount++;
+	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete[] *iter;
+		if (m_pPlayers[i].number == 0)
+		{
+			m_pPlayers[i].number = i + 1;
+			m_pPlayers[i].image = *(unsigned short*)_playerInfo;
+			memcpy(m_pPlayers[i].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
+			m_pPlayers[i].socket = _socket;
+			break;
+		}
 	}
-
-	m_chatting.clear();
+	return true;
 }

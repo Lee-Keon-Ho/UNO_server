@@ -1,7 +1,6 @@
 #pragma once
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include <deque>
 
 #define ROOM_NAME_MAX 64
 #define USER_NAME_MAX 32
@@ -27,12 +26,10 @@ public:
 		bool boss;
 	};
 
-	typedef std::deque<char*> chatting_t;
-
 private:
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
-	chatting_t m_chatting;
+
 public:
 	CRoom();
 	CRoom(int num);
@@ -42,14 +39,11 @@ public:
 	bool RoomOut(SOCKET _socket);
 	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
 	bool PlayerIn(char* _playerInfo, SOCKET _socket);
-	void PushBack(char* _chatting);
-	void ReSetChat();
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
 	stUSER* GetInRoomUserInfo() { return m_pPlayers; }
-	chatting_t* GetChatDeque() { return &m_chatting; }
 private:
 };

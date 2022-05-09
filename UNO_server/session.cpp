@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define SENDBUFFER 1000
-
+#define CHATBUFFER 64
 CSession::CSession()
 {
 	m_pUser = new CUser();
@@ -246,14 +246,14 @@ void CSession::RoomState()
 	char sendBuffer[SENDBUFFER];
 	char* tempBuffer = sendBuffer;
 
-	int count = m_pUser->GetPlayerCount();
-	int size = sizeof(CRoom::stUSER) * count;
+	int playerCount = m_pUser->GetPlayerCount();
+	int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
 	*(unsigned short*)tempBuffer = 2 + 2 + sizeof(unsigned short) + size;
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_ROOMSTATE;
 	tempBuffer += sizeof(unsigned short);
 
-	*(unsigned short*)tempBuffer = count;
+	*(unsigned short*)tempBuffer = playerCount;
 	tempBuffer += sizeof(unsigned short);
 
 	memcpy(tempBuffer, m_pUser->GetInRoomUserInfo(), size);
@@ -266,8 +266,8 @@ void CSession::RoomState()
 void CSession::Chatting()
 {
 	// 2022-04-29 수정
-	char buffer[64];
-	memset(buffer, 0, 64);
+	char buffer[CHATBUFFER];
+	memset(buffer, 0, CHATBUFFER);
 	char* tempBuffer = buffer;
 
 	unsigned short packetSize = *(unsigned short*)m_buffer;
@@ -278,44 +278,22 @@ void CSession::Chatting()
 	memcpy(tempBuffer, L" : ", wcslen(L" : ") * sizeof(wchar_t));
 	tempBuffer += wcslen(L" : ") * sizeof(wchar_t);
 	memcpy(tempBuffer, m_buffer + 4, packetSize - 4);
+	tempBuffer += packetSize - 4;
 
-	m_pUser->PushBack(buffer);
-
-	char sendBuffer[5000];
+	char sendBuffer[BUFFER_MAX];
 	char* sendTempBuffer = sendBuffer;
 
-	CRoom::chatting_t* deque = m_pUser->GetChatDeque();
-
-	if (deque->size() > 13)
-	{
-		// 2022-05-02 수정 : 보관하는게 좋은가 지우는게 좋은가...
-		std::deque<char*>::iterator iter = deque->begin();
-		delete[] * iter;
-		deque->pop_front();
-	}
-
-	int sendLen = 2 + 2 + deque->size() * 64;
+	int sendLen = 2 + 2 + tempBuffer - buffer;
 
 	*(unsigned short*)sendTempBuffer = sendLen; // 2022-04-29 test
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = CS_PT_CHATTING;
 	sendTempBuffer += sizeof(unsigned short);
-	*(unsigned short*)sendTempBuffer = deque->size();
-	sendTempBuffer += sizeof(unsigned short);
+	memcpy(sendTempBuffer, buffer, tempBuffer - buffer);
 
-	std::deque<char*>::iterator iter = deque->begin();
-	std::deque<char*>::iterator endIter = deque->end();
-
-	for (; iter != endIter; iter++)
-	{
-		memcpy(sendTempBuffer, (*iter), 64);
-		sendTempBuffer += 64;
-	}
-	
 	for (int i = 0; i < m_pUser->GetPlayerCount(); i++)
 	{
 		int sendSize = send(m_pUser->GetInRoomUserInfo()[i].socket, sendBuffer, sendLen, 0);
-		// 2022-04-29 수정 : test
 		if (sendSize < 0)
 		{
 			break;
