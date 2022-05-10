@@ -19,6 +19,7 @@ public:
 	bool CreateRoom(char* _name);
 	bool RoomIn(char* _playerInfo, SOCKET _socket); // 2022-05-02 ¼öÁ¤
 	void RoomOut(SOCKET _socket);
+	void Ready(SOCKET _socket);
 	void SetImage(int _num) { m_image = _num; }
 	wchar_t* GetName() { return m_name; }
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }

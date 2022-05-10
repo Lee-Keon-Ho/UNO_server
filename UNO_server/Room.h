@@ -24,6 +24,7 @@ public:
 		int image;
 		SOCKET socket;
 		bool boss;
+		bool ready;
 	};
 
 private:
@@ -39,6 +40,7 @@ public:
 	bool RoomOut(SOCKET _socket);
 	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
 	bool PlayerIn(char* _playerInfo, SOCKET _socket);
+	void Ready(SOCKET _socket);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }

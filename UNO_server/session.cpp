@@ -87,6 +87,9 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_CHATTING:
 		Chatting();
 		break;
+	case CS_PT_READY:
+
+		break;
 	}
 }
 
@@ -299,4 +302,9 @@ void CSession::Chatting()
 			break;
 		}
 	}
+}
+
+void CSession::Ready()
+{
+	m_pUser->Ready(m_socket);
 }

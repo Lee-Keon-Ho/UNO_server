@@ -48,3 +48,8 @@ void CUser::RoomOut(SOCKET _socket)
 {
 	if (!m_pRoom->RoomOut(_socket)) CRoomManager::GetInstance()->RoomOut();
 }
+
+void CUser::Ready(SOCKET _socket)
+{
+	m_pRoom->Ready(_socket);
+}

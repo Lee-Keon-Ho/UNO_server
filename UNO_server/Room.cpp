@@ -63,6 +63,7 @@ void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 {
 	int num = m_room.playerCount - 1;
 	m_pPlayers[num].number = m_room.playerCount;
+	m_pPlayers[num].boss = true;
 	m_pPlayers[num].image = _image;
 	memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
 	m_pPlayers[num].socket = _socket;
@@ -80,8 +81,21 @@ bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 			m_pPlayers[i].image = *(unsigned short*)_playerInfo;
 			memcpy(m_pPlayers[i].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
 			m_pPlayers[i].socket = _socket;
+			m_pPlayers[i].boss = false;
 			break;
 		}
 	}
 	return true;
+}
+
+void CRoom::Ready(SOCKET _socket)
+{
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (m_pPlayers[i].socket == _socket)
+		{
+			m_pPlayers[i].ready = !m_pPlayers[i].ready;
+			break;
+		}
+	}
 }

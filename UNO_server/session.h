@@ -34,6 +34,7 @@ public:
 	void RoomOut(SOCKET _socket);
 	void RoomState();
 	void Chatting();
+	void Ready();
 
 	SOCKET GetSock() { return m_socket; }
 	CUser* GetUser() { return m_pUser; }
