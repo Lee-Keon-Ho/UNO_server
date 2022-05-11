@@ -53,3 +53,8 @@ void CUser::Ready(SOCKET _socket)
 {
 	m_pRoom->Ready(_socket);
 }
+
+void CUser::Start()
+{
+	m_pRoom->Start();
+}

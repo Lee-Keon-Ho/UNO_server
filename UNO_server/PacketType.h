@@ -11,5 +11,6 @@ enum ePacketType
 	CS_PT_ROOMSTATE,
 	CS_PT_CHATTING,
 	CS_PT_READY,
+	CS_PT_START,
 	CS_PT_MAX
 };

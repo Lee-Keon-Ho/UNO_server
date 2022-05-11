@@ -1,19 +1,23 @@
 #include "Room.h"
 #include <memory>
+#include <time.h>
 
 #define PLAYER_MAX 5
-
+#define START_CARD 7
 CRoom::CRoom()
 {
 }
 
 CRoom::CRoom(int num)
 {
+	srand(time(NULL));
+
 	m_room.number = num;
 	m_room.playerCount = 0;
 	m_room.state = true;
 
 	memset(m_pPlayers, 0, sizeof(stUSER) * PLAYER_MAX);
+	memset(m_card, 1, CARD_MAX);
 }
 
 CRoom::~CRoom()
@@ -65,6 +69,7 @@ void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 	m_pPlayers[num].number = m_room.playerCount;
 	m_pPlayers[num].boss = true;
 	m_pPlayers[num].image = _image;
+	m_pPlayers[num].ready = true;
 	memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
 	m_pPlayers[num].socket = _socket;
 }
@@ -96,6 +101,27 @@ void CRoom::Ready(SOCKET _socket)
 		{
 			m_pPlayers[i].ready = !m_pPlayers[i].ready;
 			break;
+		}
+	}
+}
+
+void CRoom::Start()
+{
+	int nCard;
+	for (int player = 0; player < m_room.playerCount; player++)
+	{
+		for (int i = 0; i < START_CARD; i++)
+		{
+			while (true)
+			{
+				nCard = rand() % 110;
+				if (m_card[nCard])
+				{
+					m_pPlayers[player].card[i] = nCard;
+					m_card[nCard] = false;
+					break;
+				}
+			}
 		}
 	}
 }

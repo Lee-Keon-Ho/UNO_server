@@ -88,7 +88,10 @@ void CSession::HandlePacket(int _type)
 		Chatting();
 		break;
 	case CS_PT_READY:
-
+		Ready();
+		break;
+	case CS_PT_START:
+		Start();
 		break;
 	}
 }
@@ -143,19 +146,23 @@ void CSession::CreateRoom()
 		m_pUser->PlayerIn(m_socket);
 		bCreate = true;
 	}
-	else 
-	{ 
-		bCreate = false;
-	}
+	else bCreate = false;
 
-	*(unsigned short*)sendTempBuffer = 2 + 2 + 2;
+	int playerCount = m_pUser->GetPlayerCount();
+	int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
+
+	*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + size;
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = CS_PT_CREATEROOM;
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = bCreate;
 	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = playerCount;
+	sendTempBuffer += sizeof(unsigned short);
 
-	int bufferSize = sendTempBuffer - sendBuffer;
+	memcpy(sendTempBuffer, m_pUser->GetInRoomUserInfo(), size);
+
+	int bufferSize = sendTempBuffer - sendBuffer + size;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
@@ -227,14 +234,21 @@ void CSession::RoomIn()
 	if (m_pUser->RoomIn(tempBuffer, m_socket)) bRoomIn = true;
 	else bRoomIn = false;
 	
-	*(unsigned short*)sendTempBuffer = 2 + 2 + 2;
+	int playerCount = m_pUser->GetPlayerCount();
+	int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
+
+	*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + size;
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = CS_PT_INROOM;
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = bRoomIn;
 	sendTempBuffer += sizeof(unsigned short);
+	*(unsigned short*)sendTempBuffer = playerCount;
+	sendTempBuffer += sizeof(unsigned short);
 
-	int bufferSize = sendTempBuffer - sendBuffer;
+	memcpy(sendTempBuffer, m_pUser->GetInRoomUserInfo(), size);
+
+	int bufferSize = sendTempBuffer - sendBuffer + size;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
@@ -242,6 +256,30 @@ void CSession::RoomIn()
 void CSession::RoomOut(SOCKET _socket)
 {
 	m_pUser->RoomOut(_socket);
+
+	CRoomManager* pRM = CRoomManager::GetInstance();
+	CRoomManager::roomList_t* roomList = pRM->GetRoomList();
+	char sendBuffer[SENDBUFFER];
+	char* tempBuffer = sendBuffer;
+
+	int listSize = pRM->GetCount();
+	int len = sizeof(CRoom::stROOM);
+
+	*(unsigned short*)tempBuffer = 2 + 2 + (len * listSize);
+	tempBuffer += sizeof(unsigned short);
+	*(unsigned short*)tempBuffer = CS_PT_OUTROOM;
+	tempBuffer += sizeof(unsigned short);
+
+	std::vector<CRoom*>::iterator iter = roomList->begin();
+	for (int i = 0; i < listSize; iter++, i++) // 2022-04-25 수정 : 보여지는 화면만 8개(i 값은 추후에 변경)
+	{
+		memcpy(tempBuffer, (*iter)->GetInfo(), len);
+		tempBuffer += len;
+	}
+
+	int bufferSize = tempBuffer - sendBuffer;
+
+	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
 void CSession::RoomState()
@@ -307,4 +345,9 @@ void CSession::Chatting()
 void CSession::Ready()
 {
 	m_pUser->Ready(m_socket);
+}
+
+void CSession::Start()
+{
+	m_pUser->Start();
 }

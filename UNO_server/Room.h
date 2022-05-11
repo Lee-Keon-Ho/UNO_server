@@ -5,6 +5,8 @@
 #define ROOM_NAME_MAX 64
 #define USER_NAME_MAX 32
 #define PLAYER_MAX 5
+#define CARD_MAX 110
+#define USER_CARD_MAX 12
 
 class CRoom
 {
@@ -25,11 +27,14 @@ public:
 		SOCKET socket;
 		bool boss;
 		bool ready;
+		int card[12];
+		int cardCount;
 	};
 
 private:
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
+	bool m_card[CARD_MAX];
 
 public:
 	CRoom();
@@ -41,6 +46,7 @@ public:
 	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
 	bool PlayerIn(char* _playerInfo, SOCKET _socket);
 	void Ready(SOCKET _socket);
+	void Start();
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
