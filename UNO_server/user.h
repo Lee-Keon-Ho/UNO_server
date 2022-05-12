@@ -25,5 +25,6 @@ public:
 	wchar_t* GetName() { return m_name; }
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }
 	int GetPlayerCount() { return m_pRoom->GetPlayerCount(); }
+	CRoom::stROOM* GetRoominfo() { return m_pRoom->GetInfo(); }
 	CRoom::stUSER* GetInRoomUserInfo() { return m_pRoom->GetInRoomUserInfo(); }
 };

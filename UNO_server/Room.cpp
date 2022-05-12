@@ -30,6 +30,7 @@ void CRoom::CreateRoom(char* _name)
 	// 2022-04-26 ¼öÁ¤ : test
 	memcpy(m_room.name, _name, ROOM_NAME_MAX * sizeof(wchar_t));
 	m_room.playerCount = 1;
+	m_room.state = true;
 }
 
 bool CRoom::RoomOut(SOCKET _socket)
@@ -44,6 +45,11 @@ bool CRoom::RoomOut(SOCKET _socket)
 			memset(m_room.name, 0, ROOM_NAME_MAX * sizeof(wchar_t));
 			m_room.playerCount = 0;
 			m_room.state = true;
+
+			for (int i = 0; i < PLAYER_MAX; i++)
+			{
+				memset(&m_pPlayers[i], 0, sizeof(CRoom::stUSER));
+			}
 			bRoom = false;
 		}
 		else
@@ -108,20 +114,25 @@ void CRoom::Ready(SOCKET _socket)
 void CRoom::Start()
 {
 	int nCard;
-	for (int player = 0; player < m_room.playerCount; player++)
+	for (int player = 0; player < PLAYER_MAX; player++)
 	{
-		for (int i = 0; i < START_CARD; i++)
+		if (m_pPlayers[player].number != 0)
 		{
-			while (true)
+			for (int i = 0; i < START_CARD; i++)
 			{
-				nCard = rand() % 110;
-				if (m_card[nCard])
+				while (true)
 				{
-					m_pPlayers[player].card[i] = nCard;
-					m_card[nCard] = false;
-					break;
+					nCard = rand() % 110;
+					if (m_card[nCard])
+					{
+						m_pPlayers[player].card[i] = nCard;
+						m_card[nCard] = false;
+						break;
+					}
 				}
 			}
+			m_pPlayers[player].cardCount = 7;
 		}
 	}
+	m_room.state = false;
 }

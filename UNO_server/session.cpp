@@ -149,9 +149,10 @@ void CSession::CreateRoom()
 	else bCreate = false;
 
 	int playerCount = m_pUser->GetPlayerCount();
-	int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
+	int roomSize = sizeof(CRoom::stROOM);
+	int userSize = sizeof(CRoom::stUSER) * PLAYER_MAX;
 
-	*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + size;
+	*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + roomSize + userSize;
 	sendTempBuffer += sizeof(unsigned short);
 	*(unsigned short*)sendTempBuffer = CS_PT_CREATEROOM;
 	sendTempBuffer += sizeof(unsigned short);
@@ -160,9 +161,13 @@ void CSession::CreateRoom()
 	*(unsigned short*)sendTempBuffer = playerCount;
 	sendTempBuffer += sizeof(unsigned short);
 
-	memcpy(sendTempBuffer, m_pUser->GetInRoomUserInfo(), size);
+	memcpy(sendTempBuffer, m_pUser->GetRoominfo(), roomSize);
+	sendTempBuffer += roomSize;
 
-	int bufferSize = sendTempBuffer - sendBuffer + size;
+	memcpy(sendTempBuffer, m_pUser->GetInRoomUserInfo(), userSize);
+	sendTempBuffer += userSize;
+
+	int bufferSize = sendTempBuffer - sendBuffer;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
@@ -279,7 +284,11 @@ void CSession::RoomOut(SOCKET _socket)
 
 	int bufferSize = tempBuffer - sendBuffer;
 
-	send(m_socket, sendBuffer, bufferSize, 0);
+	int sendSize = send(m_socket, sendBuffer, bufferSize, 0);
+	if (sendSize < 0)
+	{
+		Sleep(10000);
+	}
 }
 
 void CSession::RoomState()
@@ -293,7 +302,6 @@ void CSession::RoomState()
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_ROOMSTATE;
 	tempBuffer += sizeof(unsigned short);
-
 	*(unsigned short*)tempBuffer = playerCount;
 	tempBuffer += sizeof(unsigned short);
 
