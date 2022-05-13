@@ -22,9 +22,11 @@ public:
 	void Ready(SOCKET _socket);
 	void Start();
 	void SetImage(int _num) { m_image = _num; }
+
 	wchar_t* GetName() { return m_name; }
 	int GetRoomNumber() { return m_pRoom->GetNumber(); }
 	int GetPlayerCount() { return m_pRoom->GetPlayerCount(); }
+	int GetCurrentCard() { return m_pRoom->GetCurrentCard(); }
 	CRoom::stROOM* GetRoominfo() { return m_pRoom->GetInfo(); }
 	CRoom::stUSER* GetInRoomUserInfo() { return m_pRoom->GetInRoomUserInfo(); }
 };

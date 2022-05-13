@@ -35,7 +35,7 @@ private:
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
 	bool m_card[CARD_MAX];
-
+	int m_currentCard;
 public:
 	CRoom();
 	CRoom(int num);
@@ -50,6 +50,7 @@ public:
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
+	int GetCurrentCard() { return m_currentCard; }
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
 	stUSER* GetInRoomUserInfo() { return m_pPlayers; }

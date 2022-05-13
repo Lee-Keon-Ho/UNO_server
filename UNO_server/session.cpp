@@ -296,18 +296,20 @@ void CSession::RoomState()
 	char sendBuffer[SENDBUFFER];
 	char* tempBuffer = sendBuffer;
 
-	int playerCount = m_pUser->GetPlayerCount();
-	int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
-	*(unsigned short*)tempBuffer = 2 + 2 + sizeof(unsigned short) + size;
+	int size = sizeof(CRoom::stROOM) + sizeof(CRoom::stUSER) * PLAYER_MAX;
+
+	*(unsigned short*)tempBuffer = 2 + 2 + 2 + size;
 	tempBuffer += sizeof(unsigned short);
 	*(unsigned short*)tempBuffer = CS_PT_ROOMSTATE;
 	tempBuffer += sizeof(unsigned short);
-	*(unsigned short*)tempBuffer = playerCount;
+	*(unsigned short*)tempBuffer = m_pUser->GetCurrentCard();
 	tempBuffer += sizeof(unsigned short);
+	memcpy(tempBuffer, m_pUser->GetRoominfo(), sizeof(CRoom::stROOM));
+	tempBuffer += sizeof(CRoom::stROOM);
+	memcpy(tempBuffer, m_pUser->GetInRoomUserInfo(), sizeof(CRoom::stUSER) * PLAYER_MAX);
+	tempBuffer += sizeof(CRoom::stUSER) * PLAYER_MAX;
 
-	memcpy(tempBuffer, m_pUser->GetInRoomUserInfo(), size);
-
-	int bufferSize = tempBuffer - sendBuffer + size;
+	int bufferSize = tempBuffer - sendBuffer;
 
 	send(m_socket, sendBuffer, bufferSize, 0);
 }

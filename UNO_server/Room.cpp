@@ -84,6 +84,7 @@ bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 {
 	if (m_room.playerCount >= PLAYER_MAX) return false;
 	m_room.playerCount++;
+	m_room.state = true;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		if (m_pPlayers[i].number == 0)
@@ -132,6 +133,17 @@ void CRoom::Start()
 				}
 			}
 			m_pPlayers[player].cardCount = 7;
+		}
+	}
+
+	while (true)
+	{
+		nCard = rand() % 110;
+		if (m_card[nCard])
+		{
+			m_currentCard = nCard;
+			m_card[nCard] = false;
+			break;
 		}
 	}
 	m_room.state = false;
