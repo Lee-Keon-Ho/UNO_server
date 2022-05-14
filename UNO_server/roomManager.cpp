@@ -62,7 +62,7 @@ CRoom* CRoomManager::CreateRoom(char* _name)
 
 CRoom* CRoomManager::RoomIn(char* _playerInfo, SOCKET _socket)
 {
-	char* tempBuffer = _playerInfo;
+	char* tempBuffer = _playerInfo; // 밖에서 변수화 시켜서 주자.
 	int number = *(unsigned short*)tempBuffer - 1;
 	tempBuffer += sizeof(unsigned short);
 	if (m_roomList[number]->PlayerIn(tempBuffer, _socket))

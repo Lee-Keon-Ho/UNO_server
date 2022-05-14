@@ -2,6 +2,12 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
+
+// gpm 전방선언 - 상호참조를 (즉 서로 include 를 하는 경우) 피할 수 있는 방법
+// class CUser;
+// 반드시 cpp에 #include " " 가 있어야 함..
+
+
 #define ROOM_NAME_MAX 64
 #define USER_NAME_MAX 32
 #define PLAYER_MAX 5
@@ -32,14 +38,18 @@ public:
 	};
 
 private:
+	//CUser*  m_Users[PLAYER_MAX];
+
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
-	bool m_card[CARD_MAX];
+	bool m_card[CARD_MAX]; // 카드는 속성이 있어야 한다. 
 	int m_currentCard;
 public:
 	CRoom();
 	CRoom(int num);
 	~CRoom();
+
+	//int GetUserNum(void); { return m_Users[0]->GetPlayerCount(); }
 
 	void CreateRoom(char* _name);
 	bool RoomOut(SOCKET _socket);
