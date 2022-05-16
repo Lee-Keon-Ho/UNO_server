@@ -16,8 +16,26 @@ CRoom::CRoom(int num)
 	m_room.playerCount = 0;
 	m_room.state = true;
 
+	for (int color = 0; color < COLOR_MAX - 1; color++)
+	{
+		for (int card = 0; card < CARD_MAX; card++)
+		{
+			m_Card[color][card].number = card;
+			m_Card[color][card].color = color;
+		}
+	}
+
+	for (int color = COLOR_MAX - 1; color < COLOR_MAX; color++)
+	{
+		for (int card = CARD_MAX - 2, x = 0; card < CARD_MAX; card++, x++)
+		{
+			m_Card[color][x].number = card;
+			m_Card[color][x].color = color;
+		}
+	}
+
 	memset(m_pPlayers, 0, sizeof(stUSER) * PLAYER_MAX);
-	memset(m_card, 1, CARD_MAX);
+	memset(m_bCard, 1, CARD_MAX);
 }
 
 CRoom::~CRoom()
@@ -124,25 +142,25 @@ void CRoom::Start()
 				while (true)
 				{
 					nCard = rand() % 110;
-					if (m_card[nCard])
+					if (m_bCard[nCard])
 					{
 						m_pPlayers[player].card[i] = nCard;
-						m_card[nCard] = false;
+						m_bCard[nCard] = false;
 						break;
 					}
 				}
 			}
-			m_pPlayers[player].cardCount = 7;
+			m_pPlayers[player].cardCount = START_CARD;
 		}
 	}
 
 	while (true)
 	{
 		nCard = rand() % 110;
-		if (m_card[nCard])
+		if (m_bCard[nCard])
 		{
 			m_currentCard = nCard;
-			m_card[nCard] = false;
+			m_bCard[nCard] = false;
 			break;
 		}
 	}
