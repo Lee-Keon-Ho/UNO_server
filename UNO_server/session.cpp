@@ -4,7 +4,7 @@
 #include "PacketType.h"
 #include <stdio.h>
 
-#define SENDBUFFER 1000
+#define SENDBUFFER 2000
 #define CHATBUFFER 64
 CSession::CSession()
 {
@@ -93,6 +93,9 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_START:
 		Start();
 		break;
+	case CS_PT_DRAWCARD:
+		DrawCard(m_socket);
+		break;
 	}
 }
 
@@ -169,7 +172,11 @@ void CSession::CreateRoom()
 
 	int bufferSize = sendTempBuffer - sendBuffer;
 
-	send(m_socket, sendBuffer, bufferSize, 0);
+	int sendSize = send(m_socket, sendBuffer, bufferSize, 0);
+	if (sendSize < 0)
+	{
+		
+	}
 }
 
 void CSession::UserList()
@@ -360,4 +367,15 @@ void CSession::Ready()
 void CSession::Start()
 {
 	m_pUser->Start();
+}
+
+void CSession::DrawCard(SOCKET _socket)
+{
+	char* tempBuffer = m_buffer + 4;
+	int cardNum = *(unsigned short*)tempBuffer;
+	tempBuffer += sizeof(unsigned short);
+	int index = *(unsigned short*)tempBuffer;
+	m_pUser->DrawCard(_socket, cardNum, index);
+
+	RoomState();
 }

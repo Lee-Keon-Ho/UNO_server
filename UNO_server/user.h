@@ -10,6 +10,7 @@ private:
 	wchar_t m_name[NAME_MAX];
 	int m_image;
 	CRoom* m_pRoom;
+
 public:
 	CUser();
 	~CUser();
@@ -21,6 +22,7 @@ public:
 	void RoomOut(SOCKET _socket);
 	void Ready(SOCKET _socket);
 	void Start();
+	void DrawCard(SOCKET _socket, int _card, int _index);
 	void SetImage(int _num) { m_image = _num; }
 
 	wchar_t* GetName() { return m_name; }

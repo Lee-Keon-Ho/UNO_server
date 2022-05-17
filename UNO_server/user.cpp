@@ -46,6 +46,7 @@ bool CUser::RoomIn(char* _playerInfo, SOCKET _socket)
 
 void CUser::RoomOut(SOCKET _socket)
 {
+	// 2022-05-17 수정하자.
 	if (!m_pRoom->RoomOut(_socket)) CRoomManager::GetInstance()->RoomOut();
 }
 
@@ -57,4 +58,9 @@ void CUser::Ready(SOCKET _socket)
 void CUser::Start()
 {
 	m_pRoom->Start();
+}
+
+void CUser::DrawCard(SOCKET _socket, int _card, int _index)
+{
+	m_pRoom->DrawCard(_socket, _card, _index);
 }

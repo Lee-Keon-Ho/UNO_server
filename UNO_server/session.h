@@ -36,6 +36,7 @@ public:
 	void Chatting();
 	void Ready();
 	void Start();
+	void DrawCard(SOCKET _socket);
 
 	SOCKET GetSock() { return m_socket; }
 	CUser* GetUser() { return m_pUser; }

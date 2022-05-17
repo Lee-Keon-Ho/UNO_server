@@ -15,6 +15,7 @@
 #define USER_CARD_MAX 12
 #define COLOR_MAX 5
 #define CARD_MAX 27
+#define USER_CARD_MAX 20
 
 class CRoom
 {
@@ -35,8 +36,9 @@ public:
 		SOCKET socket;
 		bool boss;
 		bool ready;
-		int card[20];
+		int card[USER_CARD_MAX];
 		int cardCount;
+		bool turn;
 	};
 
 	struct stCARD
@@ -50,8 +52,8 @@ private:
 
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
-	stCARD m_Card[COLOR_MAX][CARD_MAX];
-	bool m_bCard[110]; // 카드는 속성이 있어야 한다. 
+	stCARD m_Card[CARD_ALL];
+	bool m_bCard[CARD_ALL]; // 카드는 속성이 있어야 한다. 
 	int m_currentCard;
 public:
 	CRoom();
@@ -66,6 +68,7 @@ public:
 	bool PlayerIn(char* _playerInfo, SOCKET _socket);
 	void Ready(SOCKET _socket);
 	void Start();
+	void DrawCard(SOCKET _socket, int _card, int _index);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
@@ -73,5 +76,7 @@ public:
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
 	stUSER* GetInRoomUserInfo() { return m_pPlayers; }
+
+	bool Compare(int _x1, int _x2);
 private:
 };
