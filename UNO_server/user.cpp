@@ -64,3 +64,8 @@ void CUser::DrawCard(SOCKET _socket, int _card, int _index)
 {
 	m_pRoom->DrawCard(_socket, _card, _index);
 }
+
+void CUser::TakeCard(SOCKET _socket)
+{
+	m_pRoom->TakeCard(_socket);
+}

@@ -69,6 +69,7 @@ public:
 	void Ready(SOCKET _socket);
 	void Start();
 	void DrawCard(SOCKET _socket, int _card, int _index);
+	void TakeCard(SOCKET _socket);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }

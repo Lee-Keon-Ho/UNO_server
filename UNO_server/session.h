@@ -31,12 +31,13 @@ public:
 	void UserList();
 	void RoomList();
 	void RoomIn();
-	void RoomOut(SOCKET _socket);
+	void RoomOut();
 	void RoomState();
 	void Chatting();
 	void Ready();
 	void Start();
-	void DrawCard(SOCKET _socket);
+	void DrawCard();
+	void TakeCard();
 
 	SOCKET GetSock() { return m_socket; }
 	CUser* GetUser() { return m_pUser; }

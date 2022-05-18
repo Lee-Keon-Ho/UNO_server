@@ -80,6 +80,17 @@ bool CRoom::RoomOut(SOCKET _socket)
 					break;
 				}
 			}
+
+			for (int i = 0; i < PLAYER_MAX; i++)
+			{
+				if (m_pPlayers[i].number != 0)
+				{
+					m_pPlayers[i].boss = true;
+					m_pPlayers[i].ready = true;
+					m_pPlayers[i].turn = true;
+					break;
+				}
+			}
 			bRoom = true;
 		}
 	}
@@ -214,6 +225,29 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _index)
 				}
 			}
 			break;
+		}
+	}
+}
+
+void CRoom::TakeCard(SOCKET _socket)
+{
+	int nCard;
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (m_pPlayers[i].socket == _socket)
+		{
+			int cardCount = m_pPlayers[i].cardCount;
+			while (true)
+			{
+				nCard = rand() % 110;
+				if (m_bCard[nCard])
+				{
+					m_pPlayers[i].card[cardCount] = nCard;
+					m_bCard[nCard] = false;
+					break;
+				}
+			}
+			m_pPlayers[i].cardCount++;
 		}
 	}
 }

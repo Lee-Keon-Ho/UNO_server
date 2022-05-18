@@ -79,7 +79,7 @@ void CSession::HandlePacket(int _type)
 		RoomIn();
 		break;
 	case CS_PT_OUTROOM:
-		RoomOut(m_socket);
+		RoomOut();
 		break;
 	case CS_PT_ROOMSTATE:
 		RoomState();
@@ -94,7 +94,10 @@ void CSession::HandlePacket(int _type)
 		Start();
 		break;
 	case CS_PT_DRAWCARD:
-		DrawCard(m_socket);
+		DrawCard();
+		break;
+	case CS_PT_TAKECARD:
+		TakeCard();
 		break;
 	}
 }
@@ -265,9 +268,9 @@ void CSession::RoomIn()
 	send(m_socket, sendBuffer, bufferSize, 0);
 }
 
-void CSession::RoomOut(SOCKET _socket)
+void CSession::RoomOut()
 {
-	m_pUser->RoomOut(_socket);
+	m_pUser->RoomOut(m_socket);
 
 	CRoomManager* pRM = CRoomManager::GetInstance();
 	CRoomManager::roomList_t* roomList = pRM->GetRoomList();
@@ -369,13 +372,18 @@ void CSession::Start()
 	m_pUser->Start();
 }
 
-void CSession::DrawCard(SOCKET _socket)
+void CSession::DrawCard()
 {
 	char* tempBuffer = m_buffer + 4;
 	int cardNum = *(unsigned short*)tempBuffer;
 	tempBuffer += sizeof(unsigned short);
 	int index = *(unsigned short*)tempBuffer;
-	m_pUser->DrawCard(_socket, cardNum, index);
+	m_pUser->DrawCard(m_socket, cardNum, index);
 
 	RoomState();
+}
+
+void CSession::TakeCard()
+{
+	m_pUser->TakeCard(m_socket);
 }

@@ -13,5 +13,6 @@ enum ePacketType
 	CS_PT_READY,
 	CS_PT_START,
 	CS_PT_DRAWCARD,
+	CS_PT_TAKECARD,
 	CS_PT_MAX
 };
