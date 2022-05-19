@@ -52,8 +52,8 @@ private:
 
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
-	stCARD m_Card[CARD_ALL];
-	bool m_bCard[CARD_ALL]; // 카드는 속성이 있어야 한다. 
+	stCARD m_Card[CARD_ALL]; // 속성이 있는 카드
+	bool m_bCard[CARD_ALL]; 
 	int m_currentCard; // 현재 카드의 index
 	bool m_bTurn; // 방향
 	int m_nTakeCardCount;
