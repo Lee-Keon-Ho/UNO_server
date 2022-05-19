@@ -48,13 +48,16 @@ public:
 	};
 
 private:
-	//CUser*  m_Users[PLAYER_MAX];
+	//CUser*  m_Users[PLAYER_MAX]; 상호 참조를 해결하면 가능하다.
 
 	stROOM m_room;
 	stUSER m_pPlayers[PLAYER_MAX];
 	stCARD m_Card[CARD_ALL];
 	bool m_bCard[CARD_ALL]; // 카드는 속성이 있어야 한다. 
-	int m_currentCard;
+	int m_currentCard; // 현재 카드의 index
+	bool m_bTurn; // 방향
+	int m_nTakeCardCount;
+	int m_nColor;
 public:
 	CRoom();
 	CRoom(int num);
@@ -68,7 +71,7 @@ public:
 	bool PlayerIn(char* _playerInfo, SOCKET _socket);
 	void Ready(SOCKET _socket);
 	void Start();
-	void DrawCard(SOCKET _socket, int _card, int _index);
+	void DrawCard(SOCKET _socket, int _card, int _userCardindex);
 	void TakeCard(SOCKET _socket);
 
 	int GetNumber() { return m_room.number; }
@@ -79,5 +82,6 @@ public:
 	stUSER* GetInRoomUserInfo() { return m_pPlayers; }
 
 	bool Compare(int _x1, int _x2);
+	void NextTurn(bool _turn, int _i);
 private:
 };

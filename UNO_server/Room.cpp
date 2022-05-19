@@ -8,7 +8,7 @@ CRoom::CRoom()
 {
 }
 
-CRoom::CRoom(int num)
+CRoom::CRoom(int num) : m_bTurn(true), m_nTakeCardCount(1)
 {
 	srand(time(NULL));
 
@@ -170,59 +170,131 @@ void CRoom::Start()
 	while (true)
 	{
 		nCard = rand() % 110;
-		if (m_bCard[nCard])
+		if (m_Card[nCard].number < 19)
 		{
-			m_currentCard = nCard; // 여기도 수정이 필요
-			m_bCard[nCard] = false;
-			break;
+			m_nColor = m_Card[nCard].color;
+			if (m_bCard[nCard])
+			{
+				m_currentCard = nCard; 
+				m_bCard[nCard] = false;
+				break;
+			}
 		}
 	}
 	m_room.state = false;
 }
 
-void CRoom::DrawCard(SOCKET _socket, int _card, int _index)
+void CRoom::DrawCard(SOCKET _socket, int _card, int _userCardindex)
 {
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		if (m_pPlayers[i].socket == _socket)
 		{
-			if (m_Card[_card].color == m_Card[m_currentCard].color)
+			stCARD userCard = m_Card[_card];
+			stCARD currentCard = m_Card[m_currentCard];
+			bool bOk = false;
+
+			if (userCard.color == m_nColor)
 			{
-				m_currentCard = _card;
-				for (int x = _index; x < m_pPlayers[i].cardCount; x++)
+				if (currentCard.number < 19)
 				{
-					m_pPlayers[i].card[x] = m_pPlayers[i].card[x + 1];
+					if (userCard.number == 19 || userCard.number == 22)
+					{
+						m_nTakeCardCount = 2;
+					}
+					else if (userCard.number == 20)
+					{
+						m_bTurn = false;
+					}
+					else if (userCard.number == 25)
+					{
+						// 색상 변경 구현
+					}
+					else if (userCard.number == 26)
+					{
+						m_nTakeCardCount = 4;
+					}
+					m_currentCard = _card;
+					bOk = true;
 				}
-				m_pPlayers[i].cardCount--;
-				m_pPlayers[i].turn = false;
-				i++;
-				if (i == m_room.playerCount)
+				else if (currentCard.number == 19 || currentCard.number == 22) // +2
 				{
-					m_pPlayers[0].turn = true;
+					if (m_nTakeCardCount == 1)
+					{
+						m_currentCard = _card;
+						bOk = true;
+					}
+					else if (userCard.number == 19 || userCard.number == 22) // +2
+					{
+						m_nTakeCardCount += 2;
+						m_currentCard = _card;
+						bOk = true;
+					}
+					else if (userCard.number == 21 || userCard.number == 24) // stop
+					{
+						m_nTakeCardCount = 1;
+						m_currentCard = _card;
+						bOk = true;
+					}
+					else if (userCard.number == 26) // +4
+					{
+						m_nTakeCardCount += 4;
+						m_currentCard = _card;
+						bOk = true;
+					}
 				}
-				else
+				else if (currentCard.number == 20 || currentCard.number == 23)
 				{
-					m_pPlayers[i].turn = true;
+					m_currentCard = _card;
+					m_bTurn = !m_bTurn;
+					bOk = true;
+				}
+				else if (currentCard.number == 21 || currentCard.number == 24)
+				{
+					m_currentCard = _card;
+					bOk = true;
+				}
+				else if (currentCard.number == 25)
+				{
+					m_currentCard = _card;
+					// 색상 변경 구현
+					bOk = true;
+				}
+				else if (currentCard.number == 26)
+				{
+					if (userCard.number == 26)
+					{
+						m_nTakeCardCount += 4;
+
+					}
+					else if (userCard.number == 21 || userCard.number == 24)
+					{
+						m_nTakeCardCount = 1;
+					}
+					m_currentCard = _card;
+					m_bTurn = true;
+					bOk = true;
 				}
 			}
-			else if (Compare(m_Card[_card].number, m_Card[m_currentCard].number))
+			else if (Compare(userCard.number, currentCard.number))
 			{
+				m_nColor = userCard.color;
 				m_currentCard = _card;
-				for (int x = _index; x < m_pPlayers[i].cardCount; x++)
+				bOk = true;
+			}
+			else bOk = false;
+
+			if (bOk)
+			{
+				for (int x = _userCardindex; x < m_pPlayers[i].cardCount; x++)
 				{
 					m_pPlayers[i].card[x] = m_pPlayers[i].card[x + 1];
 				}
 				m_pPlayers[i].cardCount--;
 				m_pPlayers[i].turn = false;
-				i++;
-				if (i == PLAYER_MAX)
-				{
-					m_pPlayers[0].turn = true;
-				}
-				else
-				{
-					m_pPlayers[i].turn = true;
-				}
+
+				NextTurn(m_bTurn, i);
+				m_bCard[_card] = true;
 			}
 			break;
 		}
@@ -232,78 +304,151 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _index)
 void CRoom::TakeCard(SOCKET _socket)
 {
 	int nCard;
-	for (int i = 0; i < PLAYER_MAX; i++)
+	for (int index = 0; index < PLAYER_MAX; index++)
 	{
-		if (m_pPlayers[i].socket == _socket)
-		{
-			int cardCount = m_pPlayers[i].cardCount;
-			while (true)
+		if (m_pPlayers[index].socket == _socket)
+		{	
+			for (int i = 0; i < m_nTakeCardCount; i++)
 			{
-				nCard = rand() % 110;
-				if (m_bCard[nCard])
+				int cardCount = m_pPlayers[index].cardCount;
+				while (true)
 				{
-					m_pPlayers[i].card[cardCount] = nCard;
-					m_bCard[nCard] = false;
-					break;
+					nCard = rand() % 110;
+					if (m_bCard[nCard])
+					{
+						m_pPlayers[index].card[cardCount] = nCard;
+						m_bCard[nCard] = false;
+						m_pPlayers[index].turn = false;
+						break;
+					}
+				}
+				m_pPlayers[index].cardCount++;
+				if (m_pPlayers[index].cardCount > 20)
+				{
+					for (int count = 0; count < 20; i++)
+					{
+						nCard = m_pPlayers[index].card[count];
+						m_bCard[nCard] = true;
+					}
+					// player game over
 				}
 			}
-			m_pPlayers[i].cardCount++;
+			m_nTakeCardCount = 1;
+			NextTurn(m_bTurn, index);
 		}
 	}
 }
 
-bool CRoom::Compare(int _x1, int _x2)
+bool CRoom::Compare(int _userCard, int _currentCard)
 {
-	if (_x1 == _x2) return true;
-	
-	if (_x1 == 1 || _x1 == 10)
+	if (_userCard == _currentCard) return true;
+
+	if (_currentCard == 1 || _currentCard == 10)
 	{
-		if (_x2 == 1) return true;
-		if (_x2 == 10) return true;
+		if (_userCard == 1) return true;
+		if (_userCard == 10) return true;
 	}
-	else if (_x1 == 2 || _x1 == 11)
+	else if (_currentCard == 2 || _currentCard == 11)
 	{
-		if (_x2 == 2) return true;
-		if (_x2 == 11) return true;
+		if (_userCard == 2) return true;
+		if (_userCard == 11) return true;
 	}
-	else if (_x1 == 3 || _x1 == 12)
+	else if (_currentCard == 3 || _currentCard == 12)
 	{
-		if (_x2 == 3) return true;
-		if (_x2 == 12) return true;
+		if (_userCard == 3) return true;
+		if (_userCard == 12) return true;
 	}
-	else if (_x1 == 4 || _x1 == 13)
+	else if (_currentCard == 4 || _currentCard == 13)
 	{
-		if (_x2 == 4) return true;
-		if (_x2 == 13) return true;
+		if (_userCard == 4) return true;
+		if (_userCard == 13) return true;
 	}
-	else if (_x1 == 5 || _x1 == 14)
+	else if (_currentCard == 5 || _currentCard == 14)
 	{
-		if (_x2 == 5) return true;
-		if (_x2 == 14) return true;
+		if (_userCard == 5) return true;
+		if (_userCard == 14) return true;
 	}
-	else if (_x1 == 6 || _x1 == 15)
+	else if (_currentCard == 6 || _currentCard == 15)
 	{
-		if (_x2 == 6) return true;
-		if (_x2 == 15) return true;
+		if (_userCard == 6) return true;
+		if (_userCard == 15) return true;
 	}
-	else if (_x1 == 7 || _x1 == 16)
+	else if (_currentCard == 7 || _currentCard == 16)
 	{
-		if (_x2 == 7) return true;
-		if (_x2 == 16) return true;
+		if (_userCard == 7) return true;
+		if (_userCard == 16) return true;
 	}
-	else if (_x1 == 8 || _x1 == 17)
+	else if (_currentCard == 8 || _currentCard == 17)
 	{
-		if (_x2 == 8) return true;
-		if (_x2 == 17) return true;
+		if (_userCard == 8) return true;
+		if (_userCard == 17) return true;
 	}
-	else if (_x1 == 9 || _x1 == 18)
+	else if (_currentCard == 9 || _currentCard == 18)
 	{
-		if (_x2 == 9) return true;
-		if (_x2 == 18) return true;
+		if (_userCard == 9) return true;
+		if (_userCard == 18) return true;
+	}
+	else if(_currentCard == 19 || _currentCard == 22)
+	{
+		if (_userCard == 19) return true;
+		if (_userCard == 21) return true;
+		if (_userCard == 22) return true;
+		if (_userCard == 24) return true;
+		if (_userCard == 26) return true;
+	}
+	else if (_currentCard == 20 || _currentCard == 23)
+	{
+		if (_userCard == 20 || _userCard == 23)
+		{
+			m_bTurn = !m_bTurn;
+			return true;
+		}
+	}
+	else if (_currentCard == 21 || _currentCard == 24)
+	{
+		if (_userCard == 21) return true;
+		if (_userCard == 24) return true;
+	}
+	else if (_currentCard == 25)
+	{
+		if (_userCard == 25) return true;
+		if (m_Card[_userCard].color == m_nColor) return true;
+	}
+	else if (_currentCard == 26)
+	{
+		if (_userCard == 21) return true;
+		if (_userCard == 24) return true;
+		if (_userCard == 26) return true;
+	}
+	return false;
+}
+
+void CRoom::NextTurn(bool _turn, int _i)
+{
+	if (_turn)
+	{
+		while (true)
+		{
+			++_i;
+			if (_i >= PLAYER_MAX) _i = 0;
+			if (m_pPlayers[_i].number != 0)
+			{
+				m_pPlayers[_i].turn = true;
+				break;
+			}
+		}
 	}
 	else
 	{
-		return false;
+		while (true)
+		{
+			--_i;
+			if (_i < 0) _i = PLAYER_MAX - 1;
+			if (m_pPlayers[_i].number != 0)
+			{
+				m_pPlayers[_i].turn = true;
+				break;
+			}
+		}
 	}
-	return false;
 }
