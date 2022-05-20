@@ -99,6 +99,9 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_TAKECARD:
 		TakeCard();
 		break;
+	case CS_PT_CHOISECOLOR:
+		ChoiceColor();
+		break;
 	}
 }
 
@@ -297,7 +300,7 @@ void CSession::RoomOut()
 	int sendSize = send(m_socket, sendBuffer, bufferSize, 0);
 	if (sendSize < 0)
 	{
-		Sleep(10000);
+		
 	}
 }
 
@@ -386,4 +389,13 @@ void CSession::DrawCard()
 void CSession::TakeCard()
 {
 	m_pUser->TakeCard(m_socket);
+}
+
+void CSession::ChoiceColor()
+{
+	char* tempBuffer = m_buffer + 4;
+	int color = *(unsigned short*)tempBuffer;
+	m_pUser->ChoiceColor(m_socket, color);
+
+	RoomState();
 }

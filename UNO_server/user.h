@@ -24,6 +24,8 @@ public:
 	void Start();
 	void DrawCard(SOCKET _socket, int _card, int _index);
 	void TakeCard(SOCKET _socket);
+	void ChoiceColor(SOCKET _socket, int _color);
+
 	void SetImage(int _num) { m_image = _num; }
 
 	wchar_t* GetName() { return m_name; }

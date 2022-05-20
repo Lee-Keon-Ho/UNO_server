@@ -38,6 +38,7 @@ public:
 	void Start();
 	void DrawCard();
 	void TakeCard();
+	void ChoiceColor();
 
 	SOCKET GetSock() { return m_socket; }
 	CUser* GetUser() { return m_pUser; }

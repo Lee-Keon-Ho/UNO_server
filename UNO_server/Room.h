@@ -11,9 +11,8 @@
 #define ROOM_NAME_MAX 64
 #define USER_NAME_MAX 32
 #define PLAYER_MAX 5
-#define CARD_ALL 110
-#define USER_CARD_MAX 12
-#define COLOR_MAX 5
+#define CARD_ALL 108
+#define COLOR_MAX 4
 #define CARD_MAX 27
 #define USER_CARD_MAX 20
 
@@ -39,6 +38,7 @@ public:
 		int card[USER_CARD_MAX];
 		int cardCount;
 		bool turn;
+		bool choiceColor;
 	};
 
 	struct stCARD
@@ -73,6 +73,7 @@ public:
 	void Start();
 	void DrawCard(SOCKET _socket, int _card, int _userCardindex);
 	void TakeCard(SOCKET _socket);
+	void ChoiceColor(SOCKET _socket, int _color);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
@@ -81,7 +82,8 @@ public:
 	stROOM* GetInfo() { return &m_room; }
 	stUSER* GetInRoomUserInfo() { return m_pPlayers; }
 
-	bool Compare(int _x1, int _x2);
+	bool NumCompare(int _userCard, int _currentCard);
+	bool ColorCompare(int _userCard, int _currentCard);
 	void NextTurn(bool _turn, int _i);
 private:
 };
