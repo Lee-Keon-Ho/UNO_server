@@ -2,7 +2,6 @@
 #include "Room.h"
 #include <vector>
 
-// 2022-04-25 ¼öÁ¤
 class CRoomManager
 {
 private:

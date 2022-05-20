@@ -18,7 +18,7 @@ public:
 	void PlayerIn(SOCKET _socket);
 	void SetName(char* _name);
 	bool CreateRoom(char* _name);
-	bool RoomIn(char* _playerInfo, SOCKET _socket); // 2022-05-02 ¼öÁ¤
+	bool RoomIn(char* _playerInfo, SOCKET _socket);
 	void RoomOut(SOCKET _socket);
 	void Ready(SOCKET _socket);
 	void Start();

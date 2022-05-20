@@ -52,7 +52,6 @@ CRoom::~CRoom()
 
 void CRoom::CreateRoom(char* _name)
 {
-	// 2022-04-26 수정 : test
 	memcpy(m_room.name, _name, ROOM_NAME_MAX * sizeof(wchar_t));
 	m_room.playerCount = 1;
 	m_room.state = true;
@@ -163,7 +162,7 @@ void CRoom::Start()
 			{
 				while (true)
 				{
-					nCard = rand() % 110;
+					nCard = rand() % CARD_ALL;
 					if (m_bCard[nCard])
 					{
 						m_pPlayers[player].card[i] = nCard;
@@ -178,7 +177,7 @@ void CRoom::Start()
 
 	while (true)
 	{
-		nCard = rand() % 110;
+		nCard = rand() % CARD_ALL;
 		if (m_Card[nCard].number < 19)
 		{
 			m_nColor = m_Card[nCard].color;
@@ -202,7 +201,7 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _userCardindex)
 			stCARD userCard = m_Card[_card];
 			stCARD currentCard = m_Card[m_currentCard];
 			bool bOk = false;
-
+			
 			if (userCard.color == m_nColor)
 			{
 				if (ColorCompare(userCard.number, currentCard.number))
@@ -318,60 +317,67 @@ void CRoom::ChoiceColor(SOCKET _socket, int _color)
 
 bool CRoom::NumCompare(int _userCard, int _currentCard)
 {
-	if (_userCard == _currentCard) return true;
+	if (_userCard == _currentCard)
+	{
+		if (_userCard == 19 || _userCard == 22)
+		{
+			m_nTakeCardCount += 2;
+		}
+		else if (_userCard == 20 || _userCard == 23)
+		{
+			m_bTurn = !m_bTurn;
+		}
+		else if (_userCard == 25)
+		{
+			return false;
+		}
+		else if (_userCard == 26)
+		{
+			m_nTakeCardCount += 4;
+		}
+		return true;
+	}
 
 	if (_currentCard == 1 || _currentCard == 10)
 	{
-		if (_userCard == 1) return true;
-		if (_userCard == 10) return true;
+		if (_userCard == 1 || _userCard == 10) return true;
 	}
 	else if (_currentCard == 2 || _currentCard == 11)
 	{
-		if (_userCard == 2) return true;
-		if (_userCard == 11) return true;
+		if (_userCard == 2 || _userCard == 11) return true;
 	}
 	else if (_currentCard == 3 || _currentCard == 12)
 	{
-		if (_userCard == 3) return true;
-		if (_userCard == 12) return true;
+		if (_userCard == 3 || _userCard == 12) return true;
 	}
 	else if (_currentCard == 4 || _currentCard == 13)
 	{
-		if (_userCard == 4) return true;
-		if (_userCard == 13) return true;
+		if (_userCard == 4 || _userCard == 13) return true;
 	}
 	else if (_currentCard == 5 || _currentCard == 14)
 	{
-		if (_userCard == 5) return true;
-		if (_userCard == 14) return true;
+		if (_userCard == 5 || _userCard == 14) return true;
 	}
 	else if (_currentCard == 6 || _currentCard == 15)
 	{
-		if (_userCard == 6) return true;
-		if (_userCard == 15) return true;
+		if (_userCard == 6 || _userCard == 15) return true;
 	}
 	else if (_currentCard == 7 || _currentCard == 16)
 	{
-		if (_userCard == 7) return true;
-		if (_userCard == 16) return true;
+		if (_userCard == 7 || _userCard == 16) return true;
 	}
 	else if (_currentCard == 8 || _currentCard == 17)
 	{
-		if (_userCard == 8) return true;
-		if (_userCard == 17) return true;
+		if (_userCard == 8 || _userCard == 17) return true;
 	}
 	else if (_currentCard == 9 || _currentCard == 18)
 	{
-		if (_userCard == 9) return true;
-		if (_userCard == 18) return true;
+		if (_userCard == 9 || _userCard == 18) return true;
 	}
 	else if(_currentCard == 19 || _currentCard == 22)
 	{
-		if (_userCard == 19) return true;
-		if (_userCard == 21) return true;
-		if (_userCard == 22) return true;
-		if (_userCard == 24) return true;
-		if (_userCard == 26) return true;
+		if (_userCard == 19 || _userCard == 22) return true;
+		if (_userCard == 22 || _userCard == 24) return true;
 	}
 	else if (_currentCard == 20 || _currentCard == 23)
 	{
@@ -383,8 +389,7 @@ bool CRoom::NumCompare(int _userCard, int _currentCard)
 	}
 	else if (_currentCard == 21 || _currentCard == 24)
 	{
-		if (_userCard == 21) return true;
-		if (_userCard == 24) return true;
+		if (_userCard == 21 || _userCard == 24) return true;
 	}
 	else if (_currentCard == 25)
 	{
@@ -392,8 +397,7 @@ bool CRoom::NumCompare(int _userCard, int _currentCard)
 	}
 	else if (_currentCard == 26)
 	{
-		if (_userCard == 21) return true;
-		if (_userCard == 24) return true;
+		if (_userCard == 21 || _userCard == 24) return true;
 		if (_userCard == 26) return true;
 	}
 	return false;
@@ -407,9 +411,9 @@ bool CRoom::ColorCompare(int _userCard, int _currentCard)
 		{
 			m_nTakeCardCount = 2;
 		}
-		else if (_userCard == 20)
+		else if (_userCard == 20 || _userCard == 23)
 		{
-			m_bTurn = false; // 반대로
+			m_bTurn = !m_bTurn; // 반대로
 		}
 		else if (_userCard == 25)
 		{
@@ -442,40 +446,68 @@ bool CRoom::ColorCompare(int _userCard, int _currentCard)
 			m_nTakeCardCount += 4;
 			return true;
 		}
+		else
+		{
+			return false;
+		}
 	}
 	else if (_currentCard == 20 || _currentCard == 23)
 	{
 		if(_userCard == 20 || _userCard == 23) m_bTurn = !m_bTurn;
+		if (_userCard == 25) return false;
 		return true;
 	}
 	else if (_currentCard == 21 || _currentCard == 24) // stop
 	{
+		if (_userCard == 25) return false;
 		return true;
 	}
 	else if (_currentCard == 25)
 	{
-		return true;
+		if (_userCard == 25) return false;
+		else if (_userCard == 19 || _userCard == 22)
+		{
+			m_nTakeCardCount = 2;
+		}
+		else if (_userCard == 20 || _userCard == 23)
+		{
+			m_bTurn = !m_bTurn;
+		}
+		else if (_userCard == 26)
+		{
+			m_nTakeCardCount = 4;
+		}
 	}
 	else if (_currentCard == 26)
 	{
 		if (m_nTakeCardCount == 1)
 		{
-			
+			if (_userCard == 19 || _userCard == 22)
+			{
+				m_nTakeCardCount = 2;
+			}
+			else if (_userCard == 20 || _userCard == 23)
+			{
+				m_bTurn = !m_bTurn;
+			}
+			else if (_userCard == 25)
+			{
+				return false;
+			}
+			else if(_userCard == 26)
+			{
+				m_nTakeCardCount = 4;
+			}
 		}
 		else if (_userCard == 26)
 		{
 			m_nTakeCardCount += 4;
 
 		}
-		else if (_userCard == 19 || _userCard == 22)
-		{
-			m_nTakeCardCount += 2;
-		}
 		else if (_userCard == 21 || _userCard == 24)
 		{
 			m_nTakeCardCount = 1;
 		}
-		m_bTurn = true;
 		return true;
 	}
 	return false;

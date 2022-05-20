@@ -33,7 +33,6 @@ bool CUser::CreateRoom(char* _name)
 	return true;
 }
 
-//2022-05-02 ¼öÁ¤
 bool CUser::RoomIn(char* _playerInfo, SOCKET _socket)
 {
 	m_pRoom = CRoomManager::GetInstance()->RoomIn(_playerInfo, _socket);

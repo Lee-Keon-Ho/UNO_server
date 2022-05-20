@@ -329,7 +329,6 @@ void CSession::RoomState()
 
 void CSession::Chatting()
 {
-	// 2022-04-29 ¼öÁ¤
 	char buffer[CHATBUFFER];
 	memset(buffer, 0, CHATBUFFER);
 	char* tempBuffer = buffer;
