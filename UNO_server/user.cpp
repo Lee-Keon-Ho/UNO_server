@@ -73,3 +73,8 @@ void CUser::ChoiceColor(SOCKET _socket, int _color)
 {
 	m_pRoom->ChoiceColor(_socket, _color);
 }
+
+void CUser::OnRecv(char* _buffer)
+{
+	HandlePacket(_buffer);
+}

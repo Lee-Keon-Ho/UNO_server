@@ -38,6 +38,7 @@ int CSession::Recv()
 
 	while (recvedSize >= packetSize)
 	{
+		//OnRecv(m_buffer);
 		HandlePacket(type);
 
 		recvedSize -= packetSize;

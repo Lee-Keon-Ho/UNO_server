@@ -26,6 +26,13 @@ public:
 	void TakeCard(SOCKET _socket);
 	void ChoiceColor(SOCKET _socket, int _color);
 
+
+	//void HandlePacket(int _type);
+
+	// virtual ÇÔ¼öµé
+	void OnRecv(char* _buffer) override ;
+
+
 	void SetImage(int _num) { m_image = _num; }
 
 	wchar_t* GetName() { return m_name; }
@@ -34,4 +41,6 @@ public:
 	int GetCurrentCard() { return m_pRoom->GetCurrentCard(); }
 	CRoom::stROOM* GetRoominfo() { return m_pRoom->GetInfo(); }
 	CRoom::stUSER* GetInRoomUserInfo() { return m_pRoom->GetInRoomUserInfo(); }
+
+
 };

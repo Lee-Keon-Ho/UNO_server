@@ -16,7 +16,7 @@ private:
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
 
-	CUser* m_pUser; 
+	CUser* m_pUser;  // 2022-05-21 상속구조로 변경하라고!!
 
 public:
 	CSession();
@@ -25,6 +25,9 @@ public:
 
 	int Recv();
 	void HandlePacket(int _type);
+
+	virtual void OnRecv(char* m_buffer);
+
 
 	void Login();
 	void CreateRoom();
