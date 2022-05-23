@@ -274,7 +274,7 @@ void CRoom::TakeCard(SOCKET _socket)
 				int cardCount = m_pPlayers[index].cardCount;
 				while (true)
 				{
-					nCard = rand() % 110;
+					nCard = rand() % CARD_ALL;
 					if (m_bCard[nCard])
 					{
 						m_pPlayers[index].card[cardCount] = nCard;
@@ -284,9 +284,9 @@ void CRoom::TakeCard(SOCKET _socket)
 					}
 				}
 				m_pPlayers[index].cardCount++;
-				if (m_pPlayers[index].cardCount > 20)
+				if (m_pPlayers[index].cardCount > GAME_OVER)
 				{
-					for (int count = 0; count < 20; i++)
+					for (int count = 0; count < GAME_OVER; count++)
 					{
 						nCard = m_pPlayers[index].card[count];
 						m_bCard[nCard] = true;
@@ -319,17 +319,28 @@ bool CRoom::NumCompare(int _userCard, int _currentCard)
 {
 	if (_userCard == _currentCard)
 	{
-		if (_userCard == 19 || _userCard == 22)
+		if (m_nTakeCardCount == 1)
+		{
+			if (_userCard == 19 || _userCard == 22)
+			{
+				m_nTakeCardCount = 2;
+			}
+			else if (_userCard == 20 || _userCard == 23)
+			{
+				m_bTurn = !m_bTurn;
+			}
+			else if (_userCard == 25)
+			{
+				return false;
+			}
+			else if (_userCard == 26)
+			{
+				m_nTakeCardCount = 4;
+			}
+		}
+		else if (_userCard == 19 || _userCard == 22)
 		{
 			m_nTakeCardCount += 2;
-		}
-		else if (_userCard == 20 || _userCard == 23)
-		{
-			m_bTurn = !m_bTurn;
-		}
-		else if (_userCard == 25)
-		{
-			return false;
 		}
 		else if (_userCard == 26)
 		{
@@ -377,7 +388,6 @@ bool CRoom::NumCompare(int _userCard, int _currentCard)
 	else if(_currentCard == 19 || _currentCard == 22)
 	{
 		if (_userCard == 19 || _userCard == 22) return true;
-		if (_userCard == 22 || _userCard == 24) return true;
 	}
 	else if (_currentCard == 20 || _currentCard == 23)
 	{
@@ -397,7 +407,6 @@ bool CRoom::NumCompare(int _userCard, int _currentCard)
 	}
 	else if (_currentCard == 26)
 	{
-		if (_userCard == 21 || _userCard == 24) return true;
 		if (_userCard == 26) return true;
 	}
 	return false;
@@ -454,7 +463,16 @@ bool CRoom::ColorCompare(int _userCard, int _currentCard)
 	else if (_currentCard == 20 || _currentCard == 23)
 	{
 		if(_userCard == 20 || _userCard == 23) m_bTurn = !m_bTurn;
-		if (_userCard == 25) return false;
+		else if (_userCard == 25) return false;
+		else if (_userCard == 19 || _userCard == 22)
+		{
+			m_nTakeCardCount = 2;
+		}
+		else if (_userCard == 26)
+		{
+			m_nTakeCardCount = 4;
+		}
+		
 		return true;
 	}
 	else if (_currentCard == 21 || _currentCard == 24) // stop
@@ -477,6 +495,7 @@ bool CRoom::ColorCompare(int _userCard, int _currentCard)
 		{
 			m_nTakeCardCount = 4;
 		}
+		return true;
 	}
 	else if (_currentCard == 26)
 	{
@@ -494,21 +513,23 @@ bool CRoom::ColorCompare(int _userCard, int _currentCard)
 			{
 				return false;
 			}
-			else if(_userCard == 26)
+			else if (_userCard == 26)
 			{
 				m_nTakeCardCount = 4;
 			}
+			return true;
 		}
 		else if (_userCard == 26)
 		{
 			m_nTakeCardCount += 4;
-
+			return true;
 		}
 		else if (_userCard == 21 || _userCard == 24)
 		{
 			m_nTakeCardCount = 1;
+			return true;
 		}
-		return true;
+		else return false;
 	}
 	return false;
 }
@@ -523,8 +544,15 @@ void CRoom::NextTurn(bool _turn, int _i)
 			if (_i >= PLAYER_MAX) _i = 0;
 			if (m_pPlayers[_i].number != 0)
 			{
-				m_pPlayers[_i].turn = true;
-				break;
+				if (m_pPlayers[_i].cardCount >= GAME_OVER)
+				{
+					m_pPlayers[_i].turn = false;
+				}
+				else
+				{
+					m_pPlayers[_i].turn = true;
+					break;
+				}
 			}
 		}
 	}
@@ -536,8 +564,15 @@ void CRoom::NextTurn(bool _turn, int _i)
 			if (_i < 0) _i = PLAYER_MAX - 1;
 			if (m_pPlayers[_i].number != 0)
 			{
-				m_pPlayers[_i].turn = true;
-				break;
+				if (m_pPlayers[_i].cardCount >= GAME_OVER)
+				{
+					m_pPlayers[_i].turn = false;
+				}
+				else
+				{
+					m_pPlayers[_i].turn = true;
+					break;
+				}
 			}
 		}
 	}

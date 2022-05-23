@@ -30,7 +30,7 @@ public:
 	//void HandlePacket(int _type);
 
 	// virtual ÇÔ¼öµé
-	void OnRecv(char* _buffer) override ;
+	//void OnRecv(char* _buffer) override ;
 
 
 	void SetImage(int _num) { m_image = _num; }

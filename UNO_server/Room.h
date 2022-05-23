@@ -15,6 +15,7 @@
 #define COLOR_MAX 4
 #define CARD_MAX 27
 #define USER_CARD_MAX 20
+#define GAME_OVER 19
 
 class CRoom
 {

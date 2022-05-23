@@ -26,7 +26,7 @@ public:
 	int Recv();
 	void HandlePacket(int _type);
 
-	virtual void OnRecv(char* m_buffer);
+	//virtual void OnRecv(char* m_buffer);
 
 
 	void Login();
