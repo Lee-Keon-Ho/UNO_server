@@ -247,29 +247,34 @@ void CSession::RoomIn()
 	char sendBuffer[SENDBUFFER];
 	char* sendTempBuffer = sendBuffer;
 	bool bRoomIn = true;
+	int playerCount;
 
 	tempBuffer += (sizeof(unsigned short) * 2); // 4;
 
 	if (m_pUser->RoomIn(tempBuffer, m_socket)) bRoomIn = true;
 	else bRoomIn = false;
 	
-	int playerCount = m_pUser->GetPlayerCount();
-	int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
+	if (bRoomIn)
+	{
+		playerCount = m_pUser->GetPlayerCount();
 
-	*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + size;
-	sendTempBuffer += sizeof(unsigned short);
-	*(unsigned short*)sendTempBuffer = CS_PT_INROOM;
-	sendTempBuffer += sizeof(unsigned short);
-	*(unsigned short*)sendTempBuffer = bRoomIn;
-	sendTempBuffer += sizeof(unsigned short);
-	*(unsigned short*)sendTempBuffer = playerCount;
-	sendTempBuffer += sizeof(unsigned short);
+		int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
 
-	memcpy(sendTempBuffer, m_pUser->GetInRoomUserInfo(), size);
+		*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + size;
+		sendTempBuffer += sizeof(unsigned short);
+		*(unsigned short*)sendTempBuffer = CS_PT_INROOM;
+		sendTempBuffer += sizeof(unsigned short);
+		*(unsigned short*)sendTempBuffer = bRoomIn;
+		sendTempBuffer += sizeof(unsigned short);
+		*(unsigned short*)sendTempBuffer = playerCount;
+		sendTempBuffer += sizeof(unsigned short);
 
-	int bufferSize = sendTempBuffer - sendBuffer + size;
+		memcpy(sendTempBuffer, m_pUser->GetInRoomUserInfo(), size);
 
-	send(m_socket, sendBuffer, bufferSize, 0);
+		int bufferSize = sendTempBuffer - sendBuffer + size;
+
+		send(m_socket, sendBuffer, bufferSize, 0);
+	}
 }
 
 void CSession::RoomOut()

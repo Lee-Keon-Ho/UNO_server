@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define PLAYER_MAX 5
-#define START_CARD 7
+#define START_CARD 2
 
 #define COLOR_RED 0
 #define COLOR_GREEN 1
@@ -21,6 +21,7 @@ CRoom::CRoom(int num) : m_bTurn(true), m_nTakeCardCount(1)
 	m_room.number = num;
 	m_room.playerCount = 0;
 	m_room.state = true;
+	m_room.victory = false;
 
 	//for (int color = 0; color < COLOR_MAX - 1; color++)
 	for (int color = 0; color < COLOR_MAX; color++)
@@ -178,7 +179,7 @@ void CRoom::Start()
 	while (true)
 	{
 		nCard = rand() % CARD_ALL;
-		if (m_Card[nCard].number < 19)
+		if (m_Card[nCard].number < GAME_OVER)
 		{
 			m_nColor = m_Card[nCard].color;
 			if (m_bCard[nCard])
@@ -254,8 +255,20 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _userCardindex)
 				m_pPlayers[i].cardCount--;
 				m_pPlayers[i].turn = false;
 
+				if (m_pPlayers[i].cardCount <= 0)
+				{
+					m_room.victory = true;
+				}
+
 				m_bCard[_card] = true;
 				NextTurn(m_bTurn, i);
+			}
+			else
+			{
+				if (m_pPlayers[i].cardCount <= 0)
+				{
+					m_room.victory = true;
+				}
 			}
 			break;
 		}
@@ -284,7 +297,7 @@ void CRoom::TakeCard(SOCKET _socket)
 					}
 				}
 				m_pPlayers[index].cardCount++;
-				if (m_pPlayers[index].cardCount > GAME_OVER)
+				if (m_pPlayers[index].cardCount >= GAME_OVER)
 				{
 					for (int count = 0; count < GAME_OVER; count++)
 					{
