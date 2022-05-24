@@ -25,7 +25,7 @@ public:
 	void DrawCard(SOCKET _socket, int _card, int _index);
 	void TakeCard(SOCKET _socket);
 	void ChoiceColor(SOCKET _socket, int _color);
-
+	void Victory();
 
 	//void HandlePacket(int _type);
 

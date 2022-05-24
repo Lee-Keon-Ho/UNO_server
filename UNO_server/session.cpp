@@ -103,6 +103,9 @@ void CSession::HandlePacket(int _type)
 	case CS_PT_CHOISECOLOR:
 		ChoiceColor();
 		break;
+	case CS_PT_VICTORY:
+		m_pUser->Victory();
+		break;
 	}
 }
 

@@ -76,6 +76,7 @@ public:
 	void DrawCard(SOCKET _socket, int _card, int _userCardindex);
 	void TakeCard(SOCKET _socket);
 	void ChoiceColor(SOCKET _socket, int _color);
+	void Victory();
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
