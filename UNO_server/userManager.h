@@ -20,6 +20,7 @@ private:
 
 public:
 	userList_t* GetUserList() { return &m_userList; }
+	void AddUser(CUser* _user);
 	void Remove(CUser* _user);
 
 public:

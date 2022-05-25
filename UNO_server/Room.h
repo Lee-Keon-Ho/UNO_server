@@ -2,6 +2,7 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
+class CUser;
 
 // gpm 전방선언 - 상호참조를 (즉 서로 include 를 하는 경우) 피할 수 있는 방법
 // class CUser;

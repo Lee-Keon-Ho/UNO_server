@@ -23,6 +23,11 @@ CUserManager::~CUserManager()
 
 }
 
+void CUserManager::AddUser(CUser* _user)
+{
+	m_userList.push_back(_user);
+}
+
 void CUserManager::Remove(CUser* _user)
 {
 	m_userList.remove(_user);

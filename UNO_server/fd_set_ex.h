@@ -1,8 +1,8 @@
 #pragma once
-#include "session.h"
+#include "User.h"
 
 struct fd_set_ex : fd_set {
-    CSession* session_array[FD_SETSIZE];
+    CUser* session_array[FD_SETSIZE];
 };
 
 #define FD_CLR_EX(fd, set) do { \

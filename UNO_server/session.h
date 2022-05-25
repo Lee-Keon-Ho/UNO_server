@@ -1,7 +1,6 @@
 #pragma once
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include "user.h"
 
 #define BUFFER_MAX 1000
 
@@ -11,25 +10,25 @@
 
 class CSession //커넥션, 세션
 {
-private:
+protected:
 	SOCKET m_socket;
 	SOCKADDR_IN m_addr;
 	char m_buffer[BUFFER_MAX];
 
-	CUser* m_pUser;  // 2022-05-21 상속구조로 변경하라고!!
+	//CUser* m_pUser;  // 2022-05-21 상속구조로 변경하라고!!
 
 public:
 	CSession();
-	~CSession();
+	virtual ~CSession();
 	CSession(SOCKET _socket, SOCKADDR_IN& _addr);
 
 	int Recv();
-	void HandlePacket(int _type);
+	//void HandlePacket(int _type);
 
-	//virtual void OnRecv(char* m_buffer);
+	virtual void OnRecv();
 
 
-	void Login();
+	/*void Login();
 	void CreateRoom();
 	void UserList();
 	void RoomList();
@@ -41,9 +40,9 @@ public:
 	void Start();
 	void DrawCard();
 	void TakeCard();
-	void ChoiceColor();
+	void ChoiceColor();*/
 
 	SOCKET GetSock() { return m_socket; }
-	CUser* GetUser() { return m_pUser; }
+	//CUser* GetUser() { return m_pUser; }
 private:
 };

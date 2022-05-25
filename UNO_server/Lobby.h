@@ -4,7 +4,6 @@
 #include <list>
 #include <vector>
 
-// 2022-05-03 수정 : TEST
 class CLobby // 하나의 채널이다 라고 생각하자
 {
 public:

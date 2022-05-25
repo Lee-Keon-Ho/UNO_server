@@ -62,10 +62,10 @@ void CSelect::Accept()
 	int addrSize;
 	addrSize = sizeof(addrClient);
 	sockClient = accept(m_listenSocket, (SOCKADDR*)&addrClient, &addrSize);
-	FD_SET_EX(sockClient, new CSession(sockClient, addrClient),&m_fdSocketInfors);
+	FD_SET_EX(sockClient, new CUser(sockClient, addrClient),&m_fdSocketInfors);
 }
 
 void CSelect::remove(CSession* _session)
 {
-	CUserManager::GetInstance()->Remove(_session->GetUser());
+	//CUserManager::GetInstance()->Remove(_session->GetUser());
 };
