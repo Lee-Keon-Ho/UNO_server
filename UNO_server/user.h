@@ -3,41 +3,60 @@
 #include "Room.h"
 #include <wchar.h>
 
-
 #define NAME_MAX 32
+#define START_CARD 7
 
 class CUser : public CSession
 {
-private:
-	wchar_t m_name[NAME_MAX];
-	int m_image;
-	CRoom* m_pRoom;
+public:
+	struct stMyInfo
+	{
+		wchar_t name[NAME_MAX];
+		int image;
+	};
 
+	struct stMyGameInfo
+	{
+		int cardCount;
+		int number;
+		bool boss;
+		bool ready;
+		bool turn;
+		bool choiceColor;
+	};
+private:
+	stMyInfo m_MyInfo;
+	stMyGameInfo m_MyGameInfo;
+
+	int m_card[USER_CARD_MAX];
+
+	CRoom* m_pRoom;
 public:
 	CUser();
 	CUser(SOCKET _socket, SOCKADDR_IN& _addr);
 	~CUser();
 
-	void PlayerIn(SOCKET _socket);
-	void SetName(char* _name);
-	bool CreateRoom(char* _name);
-	bool RoomIn(char* _playerInfo, SOCKET _socket);
-	void RoomOut(SOCKET _socket);
-	void Ready(SOCKET _socket);
-	void Start();
-	void DrawCard(SOCKET _socket, int _card, int _index);
-	void TakeCard(SOCKET _socket);
-	void ChoiceColor(SOCKET _socket, int _color);
-	void Victory();
+	void Setting(int _number, bool _boos, bool _ready, bool _turn);
 
 	void HandlePacket();
 
+	
 	// virtual ÇÔ¼öµé
 	virtual void OnRecv() override;
 
-	void SetImage(int _num) { m_image = _num; }
+	void Start(bool* _bCard);
+	void DrawCard(int _cardIndex);
+	void DrawChoiceCard(int _cardIndex);
+	void Choice(int _cardIndex);
+	bool TakeCard(int _card);
+	bool Victory();
+	void GameOver(bool* _bCard);
+	void Boss();
 
-	wchar_t* GetName() { return m_name; }
-	int GetRoomNumber() { return m_pRoom->GetNumber(); }
-	int GetCurrentCard() { return m_pRoom->GetCurrentCard(); }
+	void SetCard(int _i, int _card) { m_card[_i] = _card; }
+
+	wchar_t* GetName() { return m_MyInfo.name; }
+	int GetNumber() { return m_MyGameInfo.number; }
+	stMyGameInfo GetGameInfo() { return m_MyGameInfo; }
+	SOCKET GetSocket() { return m_socket; }
 };

@@ -30,20 +30,6 @@ public:
 		bool victory;
 	};
 
-	struct stUSER
-	{
-		int number;
-		wchar_t playerName[USER_NAME_MAX]; // 유저 이름
-		int image;
-		SOCKET socket;
-		bool boss;
-		bool ready;
-		int card[USER_CARD_MAX];
-		int cardCount;
-		bool turn;
-		bool choiceColor;
-	};
-
 	struct stCARD
 	{
 		char number;
@@ -51,10 +37,11 @@ public:
 	};
 
 private:
-	//CUser*  m_Users[PLAYER_MAX]; 상호 참조를 해결하면 가능하다.
+	CUser*  m_Users[PLAYER_MAX]; //
+
+	int m_nUserCount;
 
 	stROOM m_room;
-	stUSER m_pPlayers[PLAYER_MAX];
 	stCARD m_Card[CARD_ALL]; // 속성이 있는 카드
 	bool m_bCard[CARD_ALL]; 
 	int m_currentCard; // 현재 카드의 index
@@ -71,8 +58,8 @@ public:
 	void CreateRoom(char* _name);
 	bool RoomOut(SOCKET _socket);
 	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
+	void PlayerIn(CUser* _user);
 	bool PlayerIn(char* _playerInfo, SOCKET _socket);
-	void Ready(SOCKET _socket);
 	void Start();
 	void DrawCard(SOCKET _socket, int _card, int _userCardindex);
 	void TakeCard(SOCKET _socket);
@@ -84,8 +71,7 @@ public:
 	int GetCurrentCard() { return m_currentCard; }
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
-	stUSER* GetInRoomUserInfo() { return m_pPlayers; }
-
+	CUser** GetUser() { return m_Users; }
 	bool NumCompare(int _userCard, int _currentCard);
 	bool ColorCompare(int _userCard, int _currentCard);
 	void NextTurn(bool _turn, int _i);

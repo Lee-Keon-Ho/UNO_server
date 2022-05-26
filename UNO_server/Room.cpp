@@ -43,7 +43,6 @@ CRoom::CRoom(int num) : m_bTurn(true), m_nTakeCardCount(1)
 		}
 	}*/
 
-	memset(m_pPlayers, 0, sizeof(stUSER) * PLAYER_MAX);
 	memset(m_bCard, 1, CARD_MAX);
 }
 
@@ -55,7 +54,6 @@ CRoom::~CRoom()
 void CRoom::CreateRoom(char* _name)
 {
 	memcpy(m_room.name, _name, ROOM_NAME_MAX * sizeof(wchar_t));
-	m_room.playerCount = 1;
 	m_room.state = true;
 }
 
@@ -74,7 +72,7 @@ bool CRoom::RoomOut(SOCKET _socket)
 
 			for (int i = 0; i < PLAYER_MAX; i++)
 			{
-				memset(&m_pPlayers[i], 0, sizeof(CRoom::stUSER));
+				m_Users[i] = nullptr;
 			}
 			bRoom = false;
 		}
@@ -82,20 +80,18 @@ bool CRoom::RoomOut(SOCKET _socket)
 		{
 			for (int i = 0; i < PLAYER_MAX; i++)
 			{
-				if (m_pPlayers[i].socket == _socket)
+				if (m_Users[i]->GetSocket() == _socket)
 				{
-					memset(&m_pPlayers[i], 0, sizeof(CRoom::stUSER));
+					m_Users[i] = nullptr;
 					break;
 				}
 			}
 
 			for (int i = 0; i < PLAYER_MAX; i++)
 			{
-				if (m_pPlayers[i].number != 0)
+				if (m_Users[i]->GetNumber() != 0)
 				{
-					m_pPlayers[i].boss = true;
-					m_pPlayers[i].ready = true;
-					m_pPlayers[i].turn = true;
+					m_Users[i]->Boss();
 					break;
 				}
 			}
@@ -108,21 +104,30 @@ bool CRoom::RoomOut(SOCKET _socket)
 // createRoom -> playerin
 void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
 {
-	int num = m_room.playerCount - 1;
-	m_pPlayers[num].number = m_room.playerCount;
-	m_pPlayers[num].boss = true;
-	m_pPlayers[num].image = _image;
-	m_pPlayers[num].ready = true;
-	m_pPlayers[num].cardCount = -1;
-	memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
-	m_pPlayers[num].socket = _socket;
-	m_pPlayers[num].turn = true;
-	m_pPlayers[num].choiceColor = false;
+	//int num = m_room.playerCount;
+	//m_pPlayers[num].number = m_room.playerCount;
+	//m_pPlayers[num].boss = true;
+	//m_pPlayers[num].image = _image;
+	//m_pPlayers[num].ready = true;
+	//m_pPlayers[num].cardCount = -1;
+	//memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
+	//m_pPlayers[num].socket = _socket;
+	//m_pPlayers[num].turn = true;
+	//m_pPlayers[num].choiceColor = false;
+	//m_room.playerCount++;
+}
+
+void CRoom::PlayerIn(CUser* _user)
+{
+	m_Users[m_room.playerCount] = _user;
+	if (m_room.playerCount == 0) m_Users[m_room.playerCount]->Setting(1, true, true, true);
+	else m_Users[m_room.playerCount]->Setting(m_room.playerCount, false, false, false);
+	m_room.playerCount++;
 }
 
 bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 {
-	if (m_room.playerCount >= PLAYER_MAX) return false;
+	/*if (m_room.playerCount >= PLAYER_MAX) return false;
 	m_room.playerCount++;
 	m_room.state = true;
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -139,20 +144,8 @@ bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
 			m_pPlayers[i].choiceColor = false;
 			break;
 		}
-	}
+	}*/
 	return true;
-}
-
-void CRoom::Ready(SOCKET _socket)
-{
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		if (m_pPlayers[i].socket == _socket)
-		{
-			m_pPlayers[i].ready = !m_pPlayers[i].ready;
-			break;
-		}
-	}
 }
 
 void CRoom::Start()
@@ -160,29 +153,16 @@ void CRoom::Start()
 	int nCard;
 	for (int player = 0; player < PLAYER_MAX; player++)
 	{
-		if (m_pPlayers[player].number != 0)
+		if (m_Users[player]->GetNumber() != 0)
 		{
-			for (int i = 0; i < START_CARD; i++)
-			{
-				while (true)
-				{
-					nCard = rand() % CARD_ALL;
-					if (m_bCard[nCard])
-					{
-						m_pPlayers[player].card[i] = nCard;
-						m_bCard[nCard] = false;
-						break;
-					}
-				}
-			}
-			m_pPlayers[player].cardCount = START_CARD;
+			m_Users[player]->Start(m_bCard);
 		}
 	}
 
 	while (true)
 	{
 		nCard = rand() % CARD_ALL;
-		if (m_Card[nCard].number < GAME_OVER)
+		if (m_Card[nCard].number < 19)
 		{
 			m_nColor = m_Card[nCard].color;
 			if (m_bCard[nCard])
@@ -200,7 +180,7 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _userCardindex)
 {
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (m_pPlayers[i].socket == _socket)
+		if (m_Users[i]->GetSocket() == _socket) // ? 이건 유저에서 그냥 DrawCard...
 		{
 			stCARD userCard = m_Card[_card];
 			stCARD currentCard = m_Card[m_currentCard];
@@ -215,13 +195,7 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _userCardindex)
 				}
 				else if (userCard.number == 25)
 				{
-					for (int x = _userCardindex; x < m_pPlayers[i].cardCount; x++)
-					{
-						m_pPlayers[i].card[x] = m_pPlayers[i].card[x + 1];
-					}
-					m_pPlayers[i].cardCount--;
-					m_pPlayers[i].turn = true;
-					m_pPlayers[i].choiceColor = true;
+					m_Users[i]->DrawChoiceCard(_userCardindex);
 
 					m_bCard[_card] = true;
 					bOk = false;
@@ -234,44 +208,20 @@ void CRoom::DrawCard(SOCKET _socket, int _card, int _userCardindex)
 				m_currentCard = _card;
 				bOk = true;
 			}
-			else if (userCard.number == 25)
-			{
-				for (int x = _userCardindex; x < m_pPlayers[i].cardCount; x++)
-				{
-					m_pPlayers[i].card[x] = m_pPlayers[i].card[x + 1];
-				}
-				m_pPlayers[i].cardCount--;
-				m_pPlayers[i].turn = true;
-				m_pPlayers[i].choiceColor = true;
-
-				m_bCard[_card] = true;
-				bOk = false;
-			}
 			else bOk = false;
 
 			if (bOk)
 			{
-				for (int x = _userCardindex; x < m_pPlayers[i].cardCount; x++)
-				{
-					m_pPlayers[i].card[x] = m_pPlayers[i].card[x + 1];
-				}
-				m_pPlayers[i].cardCount--;
-				m_pPlayers[i].turn = false;
+				m_Users[i]->DrawCard(_userCardindex);
 
-				if (m_pPlayers[i].cardCount <= 0)
-				{
-					m_room.victory = true;
-				}
+				if (m_Users[i]->Victory()) m_room.victory = true;
 
 				m_bCard[_card] = true;
 				NextTurn(m_bTurn, i);
 			}
 			else
 			{
-				if (m_pPlayers[i].cardCount <= 0)
-				{
-					m_room.victory = true;
-				}
+				if (m_Users[i]->Victory()) m_room.victory = true;
 			}
 			break;
 		}
@@ -283,31 +233,22 @@ void CRoom::TakeCard(SOCKET _socket)
 	int nCard;
 	for (int index = 0; index < PLAYER_MAX; index++)
 	{
-		if (m_pPlayers[index].socket == _socket)
+		if (m_Users[index]->GetSocket() == _socket)
 		{	
 			for (int i = 0; i < m_nTakeCardCount; i++)
 			{
-				int cardCount = m_pPlayers[index].cardCount;
+				int cardCount;// = m_pPlayers[index].cardCount;
 				while (true)
 				{
 					nCard = rand() % CARD_ALL;
 					if (m_bCard[nCard])
 					{
-						m_pPlayers[index].card[cardCount] = nCard;
-						m_bCard[nCard] = false;
-						m_pPlayers[index].turn = false;
+						if (!m_Users[index]->TakeCard(nCard))
+						{
+							m_Users[index]->GameOver(m_bCard);
+						}
 						break;
 					}
-				}
-				m_pPlayers[index].cardCount++;
-				if (m_pPlayers[index].cardCount >= GAME_OVER)
-				{
-					for (int count = 0; count < GAME_OVER; count++)
-					{
-						nCard = m_pPlayers[index].card[count];
-						m_bCard[nCard] = true;
-					}
-					// player game over
 				}
 			}
 			m_nTakeCardCount = 1;
@@ -322,39 +263,13 @@ void CRoom::ChoiceColor(SOCKET _socket, int _color)
 	m_nColor = _color;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (m_pPlayers[i].socket == _socket)
+		/*if (m_Users[i].socket == _socket)
 		{
 			m_pPlayers[i].choiceColor = false;
 			m_pPlayers[i].turn = false;
 			NextTurn(m_bTurn, i);
-		}
+		}*/
 	}
-}
-
-void CRoom::Victory()
-{
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		if (m_pPlayers[i].number != 0)
-		{
-			if (m_pPlayers[i].boss)
-			{
-				m_pPlayers[i].ready = true;
-				m_pPlayers[i].turn = true;
-				m_pPlayers[i].choiceColor = false;
-				m_pPlayers[i].cardCount = -1;
-			}
-			else
-			{
-				m_pPlayers[i].ready = false;
-				m_pPlayers[i].turn = false;
-				m_pPlayers[i].choiceColor = false;
-				m_pPlayers[i].cardCount = -1;
-			}
-		}
-	}
-	m_room.victory = false;
-	m_room.state = true;
 }
 
 bool CRoom::NumCompare(int _userCard, int _currentCard)
@@ -584,9 +499,9 @@ void CRoom::NextTurn(bool _turn, int _i)
 		{
 			++_i;
 			if (_i >= PLAYER_MAX) _i = 0;
-			if (m_pPlayers[_i].number != 0)
+			if (m_Users[_i]->GetNumber() != 0)
 			{
-				if (m_pPlayers[_i].cardCount >= GAME_OVER)
+				/*if (m_pPlayers[_i].cardCount >= GAME_OVER)
 				{
 					m_pPlayers[_i].turn = false;
 				}
@@ -594,7 +509,7 @@ void CRoom::NextTurn(bool _turn, int _i)
 				{
 					m_pPlayers[_i].turn = true;
 					break;
-				}
+				}*/
 			}
 		}
 	}
@@ -604,9 +519,9 @@ void CRoom::NextTurn(bool _turn, int _i)
 		{
 			--_i;
 			if (_i < 0) _i = PLAYER_MAX - 1;
-			if (m_pPlayers[_i].number != 0)
+			if (m_Users[_i]->GetNumber() != 0)
 			{
-				if (m_pPlayers[_i].cardCount >= GAME_OVER)
+				/*if (m_pPlayers[_i].cardCount >= GAME_OVER)
 				{
 					m_pPlayers[_i].turn = false;
 				}
@@ -614,7 +529,7 @@ void CRoom::NextTurn(bool _turn, int _i)
 				{
 					m_pPlayers[_i].turn = true;
 					break;
-				}
+				}*/
 			}
 		}
 	}
