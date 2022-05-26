@@ -24,7 +24,6 @@ CRoom::CRoom(int num) : m_bTurn(true), m_nTakeCardCount(1)
 	m_room.state = true;
 	m_room.victory = false;
 
-	//for (int color = 0; color < COLOR_MAX - 1; color++)
 	for (int color = 0; color < COLOR_MAX; color++)
 	{
 		for (int card = 0; card < CARD_MAX; card++)
@@ -34,15 +33,10 @@ CRoom::CRoom(int num) : m_bTurn(true), m_nTakeCardCount(1)
 		}
 	}
 
-	/*for (int color = COLOR_MAX - 1; color < COLOR_MAX; color++)
+	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		for (int card = CARD_MAX - 2, x = 0; card < CARD_MAX; card++, x++)
-		{
-			m_Card[(color * CARD_MAX) + x].number = card;
-			m_Card[(color * CARD_MAX) + x].color = color;
-		}
-	}*/
-
+		m_Users[i] = nullptr;
+	}
 	memset(m_bCard, 1, CARD_MAX);
 }
 
@@ -101,51 +95,19 @@ bool CRoom::RoomOut(SOCKET _socket)
 	return bRoom;
 }
 
-// createRoom -> playerin
-void CRoom::PlayerIn(wchar_t* _name, int _image, SOCKET _socket)
-{
-	//int num = m_room.playerCount;
-	//m_pPlayers[num].number = m_room.playerCount;
-	//m_pPlayers[num].boss = true;
-	//m_pPlayers[num].image = _image;
-	//m_pPlayers[num].ready = true;
-	//m_pPlayers[num].cardCount = -1;
-	//memcpy(m_pPlayers[num].playerName, _name, sizeof(wchar_t) * USER_NAME_MAX);
-	//m_pPlayers[num].socket = _socket;
-	//m_pPlayers[num].turn = true;
-	//m_pPlayers[num].choiceColor = false;
-	//m_room.playerCount++;
-}
-
 void CRoom::PlayerIn(CUser* _user)
 {
-	m_Users[m_room.playerCount] = _user;
-	if (m_room.playerCount == 0) m_Users[m_room.playerCount]->Setting(1, true, true, true);
-	else m_Users[m_room.playerCount]->Setting(m_room.playerCount, false, false, false);
-	m_room.playerCount++;
-}
-
-bool CRoom::PlayerIn(char* _playerInfo, SOCKET _socket)
-{
-	/*if (m_room.playerCount >= PLAYER_MAX) return false;
-	m_room.playerCount++;
-	m_room.state = true;
-	for (int i = 0; i < PLAYER_MAX; i++)
+	int playerCount = m_room.playerCount;
+	m_Users[playerCount] = _user;
+	if (m_room.playerCount == 0)
 	{
-		if (m_pPlayers[i].number == 0)
-		{
-			m_pPlayers[i].number = i + 1;
-			m_pPlayers[i].image = *(unsigned short*)_playerInfo;
-			memcpy(m_pPlayers[i].playerName, _playerInfo + sizeof(unsigned short), USER_NAME_MAX * sizeof(wchar_t));
-			m_pPlayers[i].cardCount = -1;
-			m_pPlayers[i].socket = _socket;
-			m_pPlayers[i].boss = false;
-			m_pPlayers[i].turn = false;
-			m_pPlayers[i].choiceColor = false;
-			break;
-		}
-	}*/
-	return true;
+		m_Users[playerCount]->Setting(playerCount + 1, true, true, true);
+	}
+	else
+	{
+		m_Users[m_room.playerCount]->Setting(playerCount + 1, false, false, false);
+	}
+	m_room.playerCount++;
 }
 
 void CRoom::Start()

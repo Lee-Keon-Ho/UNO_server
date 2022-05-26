@@ -60,16 +60,14 @@ CRoom* CRoomManager::CreateRoom(char* _name)
 	return nullptr;
 }
 
-CRoom* CRoomManager::RoomIn(char* _playerInfo, SOCKET _socket)
+CRoom* CRoomManager::RoomIn(int _roomNumber)
 {
-	char* tempBuffer = _playerInfo; // 밖에서 변수화 시켜서 주자.
-	int number = *(unsigned short*)tempBuffer - 1;
-	tempBuffer += sizeof(unsigned short);
-	if (m_roomList[number]->PlayerIn(tempBuffer, _socket))
+	int playercount = m_roomList[_roomNumber]->GetPlayerCount();
+	if (playercount != 0 && playercount < PLAYER_MAX)
 	{
-		return m_roomList[number];
+		return m_roomList[_roomNumber];
 	}
-	return nullptr;
+	return nullptr;	
 }
 
 void CRoomManager::RoomOut()

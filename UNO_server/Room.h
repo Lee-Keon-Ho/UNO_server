@@ -57,14 +57,12 @@ public:
 
 	void CreateRoom(char* _name);
 	bool RoomOut(SOCKET _socket);
-	void PlayerIn(wchar_t* _name, int _image, SOCKET _socket);
 	void PlayerIn(CUser* _user);
-	bool PlayerIn(char* _playerInfo, SOCKET _socket);
 	void Start();
 	void DrawCard(SOCKET _socket, int _card, int _userCardindex);
 	void TakeCard(SOCKET _socket);
 	void ChoiceColor(SOCKET _socket, int _color);
-	void Victory();
+	//void Victory();
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }

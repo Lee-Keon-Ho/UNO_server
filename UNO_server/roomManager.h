@@ -25,7 +25,7 @@ public:
 	void Cleanup();
 
 	CRoom* CreateRoom(char* _name);
-	CRoom* RoomIn(char* _playerInfo, SOCKET _socket);
+	CRoom* RoomIn(int _roomNumber);
 	void RoomOut();
 
 	int GetCount() { return m_count; }

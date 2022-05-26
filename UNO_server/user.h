@@ -9,14 +9,10 @@
 class CUser : public CSession
 {
 public:
-	struct stMyInfo
+	struct stUserInfo
 	{
 		wchar_t name[NAME_MAX];
 		int image;
-	};
-
-	struct stMyGameInfo
-	{
 		int cardCount;
 		int number;
 		bool boss;
@@ -25,8 +21,7 @@ public:
 		bool choiceColor;
 	};
 private:
-	stMyInfo m_MyInfo;
-	stMyGameInfo m_MyGameInfo;
+	stUserInfo m_MyInfo;
 
 	int m_card[USER_CARD_MAX];
 
@@ -56,7 +51,7 @@ public:
 	void SetCard(int _i, int _card) { m_card[_i] = _card; }
 
 	wchar_t* GetName() { return m_MyInfo.name; }
-	int GetNumber() { return m_MyGameInfo.number; }
-	stMyGameInfo GetGameInfo() { return m_MyGameInfo; }
+	int GetNumber() { return m_MyInfo.number; }
+	stUserInfo* GetGameInfo() { return &m_MyInfo; }
 	SOCKET GetSocket() { return m_socket; }
 };

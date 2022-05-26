@@ -16,12 +16,12 @@ CUser::CUser()
 CUser::CUser(SOCKET _socket, SOCKADDR_IN& _addr)
 	: CSession(_socket, _addr)
 {
-	m_MyGameInfo.boss = false;
-	m_MyGameInfo.ready = false;
-	m_MyGameInfo.turn = false;
-	m_MyGameInfo.choiceColor = false;
-	m_MyGameInfo.cardCount = -1;
-	m_MyGameInfo.number = 0;
+	m_MyInfo.boss = false;
+	m_MyInfo.ready = false;
+	m_MyInfo.turn = false;
+	m_MyInfo.choiceColor = false;
+	m_MyInfo.cardCount = -1;
+	m_MyInfo.number = 0;
 }
 
 CUser::~CUser()
@@ -31,10 +31,10 @@ CUser::~CUser()
 
 void CUser::Setting(int _number, bool _boss, bool _ready, bool _turn)
 {
-	m_MyGameInfo.number = _number;
-	m_MyGameInfo.boss = _boss;
-	m_MyGameInfo.ready = _ready;
-	m_MyGameInfo.turn = _turn;
+	m_MyInfo.number = _number;
+	m_MyInfo.boss = _boss;
+	m_MyInfo.ready = _ready;
+	m_MyInfo.turn = _turn;
 }
 
 // 2022-05-25 수정
@@ -94,43 +94,43 @@ void CUser::HandlePacket()
 		if (m_pRoom != nullptr)
 		{
 			m_pRoom->PlayerIn(this);
-			//m_pRoom->PlayerIn(m_name, m_image, m_socket);
 			bCreate = true;
 		}
 		else bCreate = false;
 
-		int playerCount = m_pRoom->GetPlayerCount();
-		int roomSize = sizeof(CRoom::stROOM);
-		//int userSize = sizeof(CRoom::stUSER) * PLAYER_MAX; // 수정이 필요한 부분
-
-		int userSize = ((sizeof(WCHAR) * NAME_MAX) + 2 + 2 + 2 + 2 + 2 + 2 + 2) * m_pRoom->GetPlayerCount();
-
-		*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + 2 + roomSize + userSize;
-		sendTempBuffer += sizeof(unsigned short);
-		*(unsigned short*)sendTempBuffer = CS_PT_CREATEROOM;
-		sendTempBuffer += sizeof(unsigned short);
-		*(unsigned short*)sendTempBuffer = bCreate;
-		sendTempBuffer += sizeof(unsigned short);
-		*(unsigned short*)sendTempBuffer = playerCount;
-		sendTempBuffer += sizeof(unsigned short);
-
-		memcpy(sendTempBuffer, m_pRoom->GetInfo(), roomSize);
-		sendTempBuffer += roomSize;
-
-		CUser** temp = m_pRoom->GetUser();
-		for (int i = 0; i < PLAYER_MAX; i++)
+		if (bCreate)
 		{
-			temp[i]->GetGameInfo();
-		}
-		//memcpy(sendTempBuffer, m_pRoom->GetInRoomUserInfo(), userSize);
-		//sendTempBuffer += userSize;
+			int playerCount = m_pRoom->GetPlayerCount();
+			int roomSize = sizeof(CRoom::stROOM);
+			//int userSize = sizeof(CRoom::stUSER) * PLAYER_MAX; // 수정이 필요한 부분
 
-		int bufferSize = sendTempBuffer - sendBuffer;
+			int userSize = (sizeof(m_MyInfo) * m_pRoom->GetPlayerCount());
 
-		int sendSize = send(m_socket, sendBuffer, bufferSize, 0);
-		if (sendSize < 0)
-		{
-			//
+			*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + 2 + roomSize + userSize;
+			sendTempBuffer += sizeof(unsigned short);
+			*(unsigned short*)sendTempBuffer = CS_PT_CREATEROOM;
+			sendTempBuffer += sizeof(unsigned short);
+			*(unsigned short*)sendTempBuffer = bCreate;
+			sendTempBuffer += sizeof(unsigned short);
+			*(unsigned short*)sendTempBuffer = playerCount;
+			sendTempBuffer += sizeof(unsigned short);
+
+			memcpy(sendTempBuffer, m_pRoom->GetInfo(), roomSize);
+			sendTempBuffer += roomSize;
+
+			CUser** temp = m_pRoom->GetUser();
+			for (int i = 0; i < PLAYER_MAX; i++)
+			{
+				if (temp[i] != nullptr)
+				{
+					memcpy(sendTempBuffer, temp[i]->GetGameInfo(), sizeof(m_MyInfo));
+					sendTempBuffer += sizeof(m_MyInfo);
+				}
+			}
+
+			int bufferSize = sendTempBuffer - sendBuffer;
+
+			int sendSize = send(m_socket, sendBuffer, bufferSize, 0);
 		}
 	}
 		break;
@@ -195,9 +195,13 @@ void CUser::HandlePacket()
 		bool bRoomIn = true;
 		int playerCount;
 
-		m_pRoom = CRoomManager::GetInstance()->RoomIn(tempBuffer, m_socket);
+		m_pRoom = CRoomManager::GetInstance()->RoomIn(*(unsigned short*)tempBuffer - 1);
+		tempBuffer += sizeof(unsigned short);
+
+		m_MyInfo.image = *(unsigned short*)tempBuffer;
 		if (m_pRoom != nullptr)
 		{
+			m_pRoom->PlayerIn(this);
 			bRoomIn = true;
 		}
 		else bRoomIn = false;
@@ -206,9 +210,9 @@ void CUser::HandlePacket()
 		{
 			playerCount = m_pRoom->GetPlayerCount();
 
-			int size = sizeof(CRoom::stUSER) * PLAYER_MAX;
+			int size = sizeof(m_MyInfo) * PLAYER_MAX;
 
-			*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + sizeof(unsigned short) + size;
+			*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + 2 + size;
 			sendTempBuffer += sizeof(unsigned short);
 			*(unsigned short*)sendTempBuffer = CS_PT_INROOM;
 			sendTempBuffer += sizeof(unsigned short);
@@ -217,9 +221,17 @@ void CUser::HandlePacket()
 			*(unsigned short*)sendTempBuffer = playerCount;
 			sendTempBuffer += sizeof(unsigned short);
 
-			memcpy(sendTempBuffer, m_pRoom->GetInRoomUserInfo(), size);
+			CUser** temp = m_pRoom->GetUser();
+			for (int i = 0; i < PLAYER_MAX; i++)
+			{
+				if (temp[i] != nullptr)
+				{
+					memcpy(sendTempBuffer, temp[i]->GetGameInfo(), sizeof(m_MyInfo));
+					sendTempBuffer += sizeof(m_MyInfo);
+				}
+			}
 
-			int bufferSize = sendTempBuffer - sendBuffer + size;
+			int bufferSize = sendTempBuffer - sendBuffer;
 
 			send(m_socket, sendBuffer, bufferSize, 0);
 		}
@@ -263,7 +275,7 @@ void CUser::HandlePacket()
 		char sendBuffer[SENDBUFFER];
 		char* sendTempBuffer = sendBuffer;
 
-		int size = sizeof(CRoom::stROOM) + sizeof(CRoom::stUSER) * PLAYER_MAX;
+		int size = sizeof(CRoom::stROOM) + sizeof(m_MyInfo) * m_pRoom->GetPlayerCount();
 
 		*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + size;
 		sendTempBuffer += sizeof(unsigned short);
@@ -273,8 +285,16 @@ void CUser::HandlePacket()
 		sendTempBuffer += sizeof(unsigned short);
 		memcpy(sendTempBuffer, m_pRoom->GetInfo(), sizeof(CRoom::stROOM));
 		sendTempBuffer += sizeof(CRoom::stROOM);
-		memcpy(sendTempBuffer, m_pRoom->GetInRoomUserInfo(), sizeof(CRoom::stUSER) * PLAYER_MAX);
-		sendTempBuffer += sizeof(CRoom::stUSER) * PLAYER_MAX;
+
+		CUser** temp = m_pRoom->GetUser();
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			if (temp[i] != nullptr)
+			{
+				memcpy(sendTempBuffer, temp[i]->GetGameInfo(), sizeof(m_MyInfo));
+				sendTempBuffer += sizeof(m_MyInfo);
+			}
+		}
 
 		int bufferSize = sendTempBuffer - sendBuffer;
 
@@ -289,8 +309,8 @@ void CUser::HandlePacket()
 
 		unsigned short packetSize = *(unsigned short*)m_buffer;
 
-		int size = wcslen(m_name) * sizeof(wchar_t);
-		memcpy(tempBuffer, m_name, size);
+		int size = wcslen(m_MyInfo.name) * sizeof(wchar_t);
+		memcpy(tempBuffer, m_MyInfo.name, size);
 		tempBuffer += size;
 		memcpy(tempBuffer, L" : ", wcslen(L" : ") * sizeof(wchar_t));
 		tempBuffer += wcslen(L" : ") * sizeof(wchar_t);
@@ -307,12 +327,12 @@ void CUser::HandlePacket()
 		*(unsigned short*)sendTempBuffer = CS_PT_CHATTING;
 		sendTempBuffer += sizeof(unsigned short);
 		memcpy(sendTempBuffer, buffer, tempBuffer - buffer);
-
+		
 		for (int i = 0; i < PLAYER_MAX; i++)
 		{
-			if (m_pRoom->GetInRoomUserInfo()[i].socket != 0)
+			if (m_pRoom->GetUser()[i] != nullptr)
 			{
-				int sendSize = send(m_pRoom->GetInRoomUserInfo()[i].socket, sendBuffer, sendLen, 0);
+				int sendSize = send(m_pRoom->GetUser()[i]->GetSocket(), sendBuffer, sendLen, 0);
 				if (sendSize < 0)
 				{
 					break;
@@ -323,7 +343,7 @@ void CUser::HandlePacket()
 	}
 		break;
 	case CS_PT_READY:
-		m_ready;
+		//m_ready;
 		break;
 	case CS_PT_START:
 		m_pRoom->Start();
@@ -351,7 +371,7 @@ void CUser::HandlePacket()
 		break;
 	case CS_PT_VICTORY:
 	{
-		m_pRoom->Victory();
+		//m_pRoom->Victory();
 		char sendBuffer[SENDBUFFER];
 		char* sendTempBuffer = sendBuffer;
 		*(unsigned short*)sendTempBuffer = 2 + 2;
@@ -388,48 +408,48 @@ void CUser::Start(bool* _bCard)
 			}
 		}
 	}
-	m_cardCount = START_CARD;
+	m_MyInfo.cardCount = START_CARD;
 }
 
 void CUser::DrawCard(int _cardIndex)
 {
-	for (int i = _cardIndex; i < m_cardCount; i++)
+	for (int i = _cardIndex; i < m_MyInfo.cardCount; i++)
 	{
 		m_card[i] = m_card[i + 1];
 	}
-	m_cardCount--;
-	m_turn = false;
+	m_MyInfo.cardCount--;
+	m_MyInfo.turn = false;
 }
 
 void CUser::DrawChoiceCard(int _cardIndex)
 {
-	for (int i = _cardIndex; i < m_cardCount; i++)
+	for (int i = _cardIndex; i < m_MyInfo.cardCount; i++)
 	{
 		m_card[i] = m_card[i + 1];
 	}
-	m_cardCount--;
-	m_turn = true;
-	m_choiceColor = true;
+	m_MyInfo.cardCount--;
+	m_MyInfo.turn = true;
+	m_MyInfo.choiceColor = true;
 }
 
 bool CUser::TakeCard(int _card)
 {
-	m_card[m_cardCount] = _card;
-	m_cardCount++;
-	if (m_cardCount < GAME_OVER) return true;
+	m_card[m_MyInfo.cardCount] = _card;
+	m_MyInfo.cardCount++;
+	if (m_MyInfo.cardCount < GAME_OVER) return true;
 	else return false;
 }
 
 bool CUser::Victory()
 {
-	if (m_cardCount <= 0) return true;
+	if (m_MyInfo.cardCount <= 0) return true;
 	else return false;
 }
 
 void CUser::GameOver(bool* _bCard)
 {
 	int nCard;
-	for (int i = 0; i < m_cardCount; i++)
+	for (int i = 0; i < m_MyInfo.cardCount; i++)
 	{
 		nCard = m_card[i];
 		_bCard[i] = true;
@@ -438,7 +458,7 @@ void CUser::GameOver(bool* _bCard)
 
 void CUser::Boss()
 {
-	m_boss = true;
-	m_ready = true;
-	m_turn = true;
+	m_MyInfo.boss = true;
+	m_MyInfo.ready = true;
+	m_MyInfo.turn = true;
 }
