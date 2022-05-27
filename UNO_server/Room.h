@@ -15,7 +15,7 @@ class CUser;
 #define CARD_ALL 108
 #define COLOR_MAX 4
 #define CARD_MAX 27
-#define USER_CARD_MAX 20
+#define USER_CARD_MAX 18
 #define GAME_OVER 19
 
 class CRoom
@@ -59,10 +59,14 @@ public:
 	bool RoomOut(SOCKET _socket);
 	void PlayerIn(CUser* _user);
 	void Start();
-	void DrawCard(SOCKET _socket, int _card, int _userCardindex);
-	void TakeCard(SOCKET _socket);
-	void ChoiceColor(SOCKET _socket, int _color);
+	bool DrawCard(CUser* _pUser, int _card, int _userCardindex);
+	void TakeCard(CUser* _pUser);
+	void ChoiceColor(CUser* _pUser, int _color);
 	//void Victory();
+
+	bool NumCompare(int _userCard, int _currentCard);
+	bool ColorCompare(int _userCard, int _currentCard);
+	void NextTurn(bool _turn, int _i);
 
 	int GetNumber() { return m_room.number; }
 	int GetPlayerCount() { return m_room.playerCount; }
@@ -70,8 +74,7 @@ public:
 	wchar_t* GetName() { return m_room.name; }
 	stROOM* GetInfo() { return &m_room; }
 	CUser** GetUser() { return m_Users; }
-	bool NumCompare(int _userCard, int _currentCard);
-	bool ColorCompare(int _userCard, int _currentCard);
-	void NextTurn(bool _turn, int _i);
+	int* GetUserCard(int _i);
+	SOCKET GetUserSocket(int _i);
 private:
 };

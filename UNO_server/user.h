@@ -54,4 +54,5 @@ public:
 	int GetNumber() { return m_MyInfo.number; }
 	stUserInfo* GetGameInfo() { return &m_MyInfo; }
 	SOCKET GetSocket() { return m_socket; }
+	int* GetUserCard() { return m_card; }
 };

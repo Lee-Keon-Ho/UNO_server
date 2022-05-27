@@ -42,7 +42,7 @@ public:
 	void TakeCard();
 	void ChoiceColor();*/
 
-	SOCKET GetSock() { return m_socket; }
+	//SOCKET GetSock() { return m_socket; }
 	//CUser* GetUser() { return m_pUser; }
 private:
 };

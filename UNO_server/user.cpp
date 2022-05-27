@@ -210,24 +210,26 @@ void CUser::HandlePacket()
 		{
 			playerCount = m_pRoom->GetPlayerCount();
 
-			int size = sizeof(m_MyInfo) * PLAYER_MAX;
+			int userSize = sizeof(CUser::stUserInfo) * playerCount;
+			int roomSize = sizeof(CRoom::stROOM);
 
-			*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + 2 + size;
+			*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + roomSize + userSize;
 			sendTempBuffer += sizeof(unsigned short);
 			*(unsigned short*)sendTempBuffer = CS_PT_INROOM;
 			sendTempBuffer += sizeof(unsigned short);
 			*(unsigned short*)sendTempBuffer = bRoomIn;
 			sendTempBuffer += sizeof(unsigned short);
-			*(unsigned short*)sendTempBuffer = playerCount;
-			sendTempBuffer += sizeof(unsigned short);
+
+			memcpy(sendTempBuffer, m_pRoom->GetInfo(), roomSize);
+			sendTempBuffer += roomSize;
 
 			CUser** temp = m_pRoom->GetUser();
 			for (int i = 0; i < PLAYER_MAX; i++)
 			{
 				if (temp[i] != nullptr)
 				{
-					memcpy(sendTempBuffer, temp[i]->GetGameInfo(), sizeof(m_MyInfo));
-					sendTempBuffer += sizeof(m_MyInfo);
+					memcpy(sendTempBuffer, temp[i]->GetGameInfo(), sizeof(CUser::stUserInfo));
+					sendTempBuffer += sizeof(CUser::stUserInfo);
 				}
 			}
 
@@ -246,20 +248,10 @@ void CUser::HandlePacket()
 
 		if (!m_pRoom->RoomOut(m_socket)) pRM->RoomOut();
 
-		int listSize = pRM->GetCount();
-		int len = sizeof(CRoom::stROOM);
-
-		*(unsigned short*)sendTempBuffer = 2 + 2 + (len * listSize);
+		*(unsigned short*)sendTempBuffer = 2 + 2;
 		sendTempBuffer += sizeof(unsigned short);
 		*(unsigned short*)sendTempBuffer = CS_PT_OUTROOM;
 		sendTempBuffer += sizeof(unsigned short);
-
-		std::vector<CRoom*>::iterator iter = roomList->begin();
-		for (int i = 0; i < listSize; iter++, i++) // 2022-04-25 수정 : 보여지는 화면만 8개(i 값은 추후에 변경)
-		{
-			memcpy(sendTempBuffer, (*iter)->GetInfo(), len);
-			sendTempBuffer += len;
-		}
 
 		int bufferSize = sendTempBuffer - sendBuffer;
 
@@ -275,7 +267,7 @@ void CUser::HandlePacket()
 		char sendBuffer[SENDBUFFER];
 		char* sendTempBuffer = sendBuffer;
 
-		int size = sizeof(CRoom::stROOM) + sizeof(m_MyInfo) * m_pRoom->GetPlayerCount();
+		int size = sizeof(CRoom::stROOM) + (sizeof(int) * USER_CARD_MAX) + (sizeof(m_MyInfo) * m_pRoom->GetPlayerCount());
 
 		*(unsigned short*)sendTempBuffer = 2 + 2 + 2 + size;
 		sendTempBuffer += sizeof(unsigned short);
@@ -283,6 +275,8 @@ void CUser::HandlePacket()
 		sendTempBuffer += sizeof(unsigned short);
 		*(unsigned short*)sendTempBuffer = m_pRoom->GetCurrentCard();
 		sendTempBuffer += sizeof(unsigned short);
+		memcpy(sendTempBuffer, m_card, sizeof(int)* USER_CARD_MAX);
+		sendTempBuffer += sizeof(int) * USER_CARD_MAX;
 		memcpy(sendTempBuffer, m_pRoom->GetInfo(), sizeof(CRoom::stROOM));
 		sendTempBuffer += sizeof(CRoom::stROOM);
 
@@ -343,30 +337,47 @@ void CUser::HandlePacket()
 	}
 		break;
 	case CS_PT_READY:
-		//m_ready;
+		m_MyInfo.ready = *(unsigned short*)tempBuffer;
 		break;
 	case CS_PT_START:
+	{
 		m_pRoom->Start();
+		for (int i = 0; i < m_pRoom->GetPlayerCount(); i++)
+		{
+			char sendBuffer[BUFFER_MAX];
+			char* sendTempBuffer = sendBuffer;
+
+			int cardSize = sizeof(int) * USER_CARD_MAX;
+
+			*(unsigned short*)sendTempBuffer = 2 + 2 + cardSize;
+			sendTempBuffer += sizeof(unsigned short);
+			*(unsigned short*)sendTempBuffer = CS_PT_START;
+			sendTempBuffer += sizeof(unsigned short);
+			memcpy(sendTempBuffer, m_pRoom->GetUserCard(i), cardSize);
+			sendTempBuffer += cardSize;
+
+			int sendSize = sendTempBuffer - sendBuffer;
+
+			send(m_pRoom->GetUserSocket(i), sendBuffer, sendSize, 0);
+		}
+	}
 		break;
 	case CS_PT_DRAWCARD:
 	{
 		int cardNum = *(unsigned short*)tempBuffer;
 		tempBuffer += sizeof(unsigned short);
 		int index = *(unsigned short*)tempBuffer;
-		m_pRoom->DrawCard(m_socket, cardNum, index);
-
-		//RoomState();
+		m_pRoom->DrawCard(this, cardNum, index);
 	}
 		break;
 	case CS_PT_TAKECARD:
-		m_pRoom->TakeCard(m_socket);
+		m_pRoom->TakeCard(this);
 		break;
 	case CS_PT_CHOISECOLOR:
 	{
 		int color = *(unsigned short*)tempBuffer;
-		m_pRoom->ChoiceColor(m_socket, color);
 
-		//RoomState();
+		m_pRoom->ChoiceColor(this, color);
 	}
 		break;
 	case CS_PT_VICTORY:
