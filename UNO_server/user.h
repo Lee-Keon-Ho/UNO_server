@@ -42,11 +42,11 @@ public:
 	void Start(bool* _bCard);
 	void DrawCard(int _cardIndex);
 	void DrawChoiceCard(int _cardIndex);
-	void Choice(int _cardIndex);
 	bool TakeCard(int _card);
 	bool Victory();
 	void GameOver(bool* _bCard);
 	void Boss();
+	void Reset();
 
 	void SetCard(int _i, int _card) { m_card[_i] = _card; }
 

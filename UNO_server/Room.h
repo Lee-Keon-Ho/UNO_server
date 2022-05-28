@@ -39,8 +39,6 @@ public:
 private:
 	CUser*  m_Users[PLAYER_MAX]; //
 
-	int m_nUserCount;
-
 	stROOM m_room;
 	stCARD m_Card[CARD_ALL]; // 속성이 있는 카드
 	bool m_bCard[CARD_ALL]; 
@@ -62,7 +60,7 @@ public:
 	bool DrawCard(CUser* _pUser, int _card, int _userCardindex);
 	void TakeCard(CUser* _pUser);
 	void ChoiceColor(CUser* _pUser, int _color);
-	//void Victory();
+	void Reset();
 
 	bool NumCompare(int _userCard, int _currentCard);
 	bool ColorCompare(int _userCard, int _currentCard);

@@ -380,14 +380,16 @@ void CUser::HandlePacket()
 		m_pRoom->ChoiceColor(this, color);
 	}
 		break;
-	case CS_PT_VICTORY:
+	case CS_PT_RESET:
 	{
 		//m_pRoom->Victory();
+		m_pRoom->Reset();
+
 		char sendBuffer[SENDBUFFER];
 		char* sendTempBuffer = sendBuffer;
 		*(unsigned short*)sendTempBuffer = 2 + 2;
 		sendTempBuffer += sizeof(unsigned short);
-		*(unsigned short*)sendTempBuffer = CS_PT_VICTORY;
+		*(unsigned short*)sendTempBuffer = CS_PT_RESET;
 		sendTempBuffer += sizeof(unsigned short);
 
 		int size = sendTempBuffer - sendBuffer;
@@ -472,4 +474,21 @@ void CUser::Boss()
 	m_MyInfo.boss = true;
 	m_MyInfo.ready = true;
 	m_MyInfo.turn = true;
+}
+
+void CUser::Reset()
+{
+	if (m_MyInfo.boss)
+	{
+		m_MyInfo.ready = true;
+		m_MyInfo.turn = true;
+		
+	}
+	else
+	{
+		m_MyInfo.ready = false;
+		m_MyInfo.turn = false;
+	}
+	m_MyInfo.choiceColor = false;
+	m_MyInfo.cardCount = -1;
 }
