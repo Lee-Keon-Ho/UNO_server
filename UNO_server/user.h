@@ -4,7 +4,6 @@
 #include <wchar.h>
 
 #define NAME_MAX 32
-#define START_CARD 7
 
 class CUser : public CSession
 {
@@ -48,6 +47,21 @@ public:
 	void Boss();
 	void Reset();
 
+	void LogIn(char* _info);
+	void CreateRoom(char* _info);
+	void UserList();
+	void RoomList();
+	void RoomIn(char* _info);
+	void RoomOut();
+	void RoomState();
+	void Chatting();
+	void GameStart();
+	void UserDrawCard(char* _cardInfo);
+	void ChoiseColor(char* _color);
+	void GameReset();
+	void RoomInOutChat(const wchar_t* _str);
+	void QuickRoomIn();
+public:
 	void SetCard(int _i, int _card) { m_card[_i] = _card; }
 
 	wchar_t* GetName() { return m_MyInfo.name; }

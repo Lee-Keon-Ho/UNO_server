@@ -26,6 +26,7 @@ public:
 
 	CRoom* CreateRoom(char* _name);
 	CRoom* RoomIn(int _roomNumber);
+	CRoom* QuickRoomIn();
 	void RoomOut();
 
 	int GetCount() { return m_count; }

@@ -1,5 +1,7 @@
 #include "roomManager.h"
 
+#define ROOM_MAX 63
+
 CRoomManager* CRoomManager::pInstance = nullptr;
 
 CRoomManager* CRoomManager::GetInstance()
@@ -25,8 +27,8 @@ CRoomManager::~CRoomManager()
 
 bool CRoomManager::Initialize()
 {
-	m_roomList.reserve(63);
-	for (int i = 1; i < 64; i++)
+	m_roomList.reserve(ROOM_MAX);
+	for (int i = 1; i < ROOM_MAX + 1 ; i++)
 	{
 		m_roomList.push_back(new CRoom(i));
 	}
@@ -48,7 +50,7 @@ void CRoomManager::Cleanup()
 
 CRoom* CRoomManager::CreateRoom(char* _name)
 {
-	for (int i = 0; i < 63; i++)
+	for (int i = 0; i < ROOM_MAX; i++)
 	{
 		if (m_roomList[i]->GetPlayerCount() == 0)
 		{
@@ -68,6 +70,18 @@ CRoom* CRoomManager::RoomIn(int _roomNumber)
 		return m_roomList[_roomNumber];
 	}
 	return nullptr;	
+}
+
+CRoom* CRoomManager::QuickRoomIn()
+{
+	for (int i = 0; i < m_count; i++)
+	{
+		if (m_roomList[i]->GetPlayerCount() < PLAYER_MAX)
+		{
+			return m_roomList[i];
+		}
+	}
+	return nullptr;
 }
 
 void CRoomManager::RoomOut()
