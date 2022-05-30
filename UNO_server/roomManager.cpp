@@ -65,7 +65,8 @@ CRoom* CRoomManager::CreateRoom(char* _name)
 CRoom* CRoomManager::RoomIn(int _roomNumber)
 {
 	int playercount = m_roomList[_roomNumber]->GetPlayerCount();
-	if (playercount != 0 && playercount < PLAYER_MAX)
+	if (playercount != 0 && playercount < PLAYER_MAX && 
+		m_roomList[_roomNumber]->GetInfo()->state)
 	{
 		return m_roomList[_roomNumber];
 	}
@@ -76,7 +77,8 @@ CRoom* CRoomManager::QuickRoomIn()
 {
 	for (int i = 0; i < m_count; i++)
 	{
-		if (m_roomList[i]->GetPlayerCount() < PLAYER_MAX)
+		if (m_roomList[i]->GetPlayerCount() < PLAYER_MAX && 
+			m_roomList[i]->GetInfo()->state)
 		{
 			return m_roomList[i];
 		}
