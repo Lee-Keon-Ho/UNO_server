@@ -4,7 +4,7 @@ int main(void)
 {
 	CApp app;
 
-	if (!app.Initialize("211.218.197.24", 30002)) return 0;
+	if (!app.Initialize("192.168.123.21", 30002)) return 0;
 
 	app.Update();
 
